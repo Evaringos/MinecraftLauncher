@@ -78,6 +78,11 @@ def center_window(window, width=300, height=300):
     x = (screen_width // 2) - (width // 2)
     y = (screen_height // 2) - (height // 2)
     window.geometry(f'{width}x{height}+{x}+{y}')
+    
+def forge_versions():
+#    command = minecraft_launcher_lib.command.get_minecraft_command(version, minecraft_path, options)
+    global version
+    version = '1.20.1-forge-47.3.7'
 
 # Окно и название окна
 root = tk.Tk()
@@ -103,6 +108,10 @@ nickname_entry.pack(pady=5)
 # Кнопка входа в игру
 launch_button = tk.Button(frame, text="Играть", command=launch_game, state=tk.DISABLED)
 launch_button.pack(pady=10)
+
+# Strad версии forge
+forge_button = tk.Button(frame, text="Forge", command=forge_versions)
+forge_button.pack(padx=2)
 
 # Кнопка начала установки игры
 install_button = tk.Button(frame, text="Начать установку", command=install_game)
