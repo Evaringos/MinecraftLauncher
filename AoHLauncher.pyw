@@ -16,7 +16,6 @@ version = "1.20.1"
 
 # Путь установки игры
 minecraft_path = os.path.join(os.getenv('APPDATA'), '.AoHLauncher')
-# minecraft_path = "C:\\Users\\Evarin\\AppData\\Roaming\\AoHLauncher"
 
 # Функция для установки игры
 def install_game():
@@ -61,7 +60,6 @@ def launch_game():
 # Кнопка закрытия лаунчера
 def close_window():
     os.startfile(minecraft_path)
-    #root.destroy()
 
 # Выравнивание позиции открытия окна и размер открываемого окна
 def center_window(window, width=300, height=300):
@@ -74,6 +72,10 @@ def center_window(window, width=300, height=300):
 # Окно и название окна
 root = tk.Tk()
 root.title("AoH Launcher")
+
+# Установка иконки
+icon_path = os.path.join(os.path.dirname(__file__), 'cache', 'logo.ico')
+root.iconbitmap(icon_path)
 
 # Центрируем окно
 center_window(root)
