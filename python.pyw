@@ -15,13 +15,12 @@ username = ""
 version = "1.20.1"
 
 # Путь установки игры
-# minecraft_path = os.path.join(os.getenv('APPDATA'), 'AoHLauncher')
-minecraft_path = "C:\\Users\\Evarin\\AppData\\Roaming\\AoHLauncher"
+minecraft_path = os.path.join(os.getenv('APPDATA'), '.AoHLauncher')
+# minecraft_path = "C:\\Users\\Evarin\\AppData\\Roaming\\AoHLauncher"
 
 # Функция для установки игры
 def install_game():
     if os.path.exists(minecraft_path):
-        os.startfile(minecraft_path)
         print("Игра уже установлена")
         on_installation_complete()
     else:
@@ -61,7 +60,8 @@ def launch_game():
 
 # Кнопка закрытия лаунчера
 def close_window():
-    root.destroy()
+    os.startfile(minecraft_path)
+    #root.destroy()
 
 # Выравнивание позиции открытия окна и размер открываемого окна
 def center_window(window, width=300, height=300):
