@@ -29,7 +29,17 @@ def install_game():
 
 # Функция для выполнения установки в фоновом режиме
 def install_in_background():
+    # Установка Minecraft
     minecraft_launcher_lib.install.install_minecraft_version(version, minecraft_path)
+    
+    # Установка Forge
+    forge_version = minecraft_launcher_lib.forge.find_forge_version(version)
+    if forge_version:
+        minecraft_launcher_lib.forge.install_forge_version(forge_version, minecraft_path)
+        print("Forge установлен")
+    else:
+        print("Forge версия не найдена для данной версии Minecraft")
+    
     root.after(0, on_installation_complete)
 
 # Функция для завершения установки
@@ -38,7 +48,7 @@ def on_installation_complete():
     progress_bar.stop()
     is_game_installed = True
     launch_button.config(state=tk.NORMAL)
-    print("Игра установлена")
+    print("Игра и Forge установлены")
 
 # Кнопка запуска игры
 def launch_game():
@@ -103,7 +113,7 @@ progress_bar = ttk.Progressbar(frame, mode='indeterminate')
 progress_bar.pack(pady=10)
 
 # Кнопка выхода из лаунчера
-close_button = tk.Button(frame, text="Закрыть лаунчер", command=close_window)
+close_button = tk.Button(frame, text="Открыть папку с игрой", command=close_window)
 close_button.pack(pady=10)
 
 print(f"Путь установки: {minecraft_path}")
