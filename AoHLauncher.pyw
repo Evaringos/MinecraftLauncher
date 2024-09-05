@@ -11,15 +11,32 @@ is_game_installed = False
 # Переменная для хранения никнейма
 username = ""
 
-# Версия игры
-version = "1.20.1"
+# Базовая версия игры
+base_version = "1.20.1"
 
 # Путь установки игры
 minecraft_path = os.path.join(os.getenv('APPDATA'), '.AoHLauncher')
 
+# Переменная для хранения версии Forge
+forge_version_name = None
+
+# Функция для проверки установки игры при запуске
+def check_game_installed():
+    global is_game_installed, forge_version_name
+    if os.path.exists(minecraft_path):
+        print("Игра уже установлена")
+        is_game_installed = True
+        # Проверяем, установлена ли версия Forge
+        versions = minecraft_launcher_lib.utils.get_installed_versions(minecraft_path)
+        for version in versions:
+            if version["id"].startswith(base_version + "-forge"):
+                forge_version_name = version["id"]
+                break
+        launch_button.config(state=tk.NORMAL)
+
 # Функция для установки игры
 def install_game():
-    if os.path.exists(minecraft_path):
+    if is_game_installed:
         print("Игра уже установлена")
         on_installation_complete()
     else:
@@ -29,13 +46,14 @@ def install_game():
 
 # Функция для выполнения установки в фоновом режиме
 def install_in_background():
-    # Установка Minecraft
-    minecraft_launcher_lib.install.install_minecraft_version(version, minecraft_path)
+    global forge_version_name
+    # Установка базовой версии Minecraft
+    minecraft_launcher_lib.install.install_minecraft_version(base_version, minecraft_path)
     
-    # Установка Forge
-    forge_version = minecraft_launcher_lib.forge.find_forge_version(version)
+    # Поиск и установка последней доступной версии Forge для указанной версии Minecraft
+    forge_version = minecraft_launcher_lib.forge.find_forge_version(base_version)
     if forge_version:
-        minecraft_launcher_lib.forge.install_forge_version(forge_version, minecraft_path)
+        forge_version_name = minecraft_launcher_lib.forge.install_forge_version(forge_version, minecraft_path)
         print("Forge установлен")
     else:
         print("Forge версия не найдена для данной версии Minecraft")
@@ -53,7 +71,8 @@ def on_installation_complete():
 # Кнопка запуска игры
 def launch_game():
     global username
-    if is_game_installed:
+    check_game_installed() # Temp line
+    if is_game_installed and forge_version_name:
         username = nickname_entry.get()
         if username:
             print(f"Запуск игры с никнеймом: {username}")
@@ -62,13 +81,14 @@ def launch_game():
                 "uuid": "",
                 "token": ""
             }
-            command = minecraft_launcher_lib.command.get_minecraft_command(version, minecraft_path, options)
+            # Используем версию Forge для запуска
+            command = minecraft_launcher_lib.command.get_minecraft_command(forge_version_name, minecraft_path, options)
             subprocess.call(command)
         else:
             print("Пожалуйста, введите никнейм")
 
 # Кнопка закрытия лаунчера
-def close_window():
+def show_way():
     os.startfile(minecraft_path)
 
 # Выравнивание позиции открытия окна и размер открываемого окна
@@ -78,11 +98,6 @@ def center_window(window, width=300, height=300):
     x = (screen_width // 2) - (width // 2)
     y = (screen_height // 2) - (height // 2)
     window.geometry(f'{width}x{height}+{x}+{y}')
-    
-def forge_versions():
-#    command = minecraft_launcher_lib.command.get_minecraft_command(version, minecraft_path, options)
-    global version
-    version = '1.20.1-forge-47.3.7'
 
 # Окно и название окна
 root = tk.Tk()
@@ -109,10 +124,6 @@ nickname_entry.pack(pady=5)
 launch_button = tk.Button(frame, text="Играть", command=launch_game, state=tk.DISABLED)
 launch_button.pack(pady=10)
 
-# Strad версии forge
-forge_button = tk.Button(frame, text="Forge", command=forge_versions)
-forge_button.pack(padx=2)
-
 # Кнопка начала установки игры
 install_button = tk.Button(frame, text="Начать установку", command=install_game)
 install_button.pack(pady=10)
@@ -121,10 +132,13 @@ install_button.pack(pady=10)
 progress_bar = ttk.Progressbar(frame, mode='indeterminate')
 progress_bar.pack(pady=10)
 
-# Кнопка выхода из лаунчера
-close_button = tk.Button(frame, text="Открыть папку с игрой", command=close_window)
-close_button.pack(pady=10)
+# Кнопка открытия пути проводника
+showway_button = tk.Button(frame, text="Открыть папку с игрой", command=show_way)
+showway_button.pack(pady=10)
 
 print(f"Путь установки: {minecraft_path}")
+
+# Проверяем, установлена ли игра при запуске лаунчера
+check_game_installed()
 
 root.mainloop()
