@@ -4,19 +4,21 @@ import os
 import subprocess
 import threading
 import minecraft_launcher_lib
+from webdav3.client import Client
+import secret
 
 # Переменная для проверки установки игры
 is_game_installed = False
-
 # Переменная для хранения никнейма
 username = ""
 
 # Базовая версия игры
 base_version = "1.20.1"
 
-# Путь установки игры
+# Путь установки игры, модов, конфигов
 minecraft_path = os.path.join(os.getenv('APPDATA'), '.AoHLauncher')
-
+minecraft_mods_path = os.path.join(minecraft_path, "mods")
+minecraft_config_path = os.path.join(minecraft_path, "config")
 # Переменная для хранения версии Forge
 forge_version_name = None
 
@@ -60,6 +62,22 @@ def install_in_background():
     
     root.after(0, on_installation_complete)
 
+
+
+# Скачивание модов и конфига
+def cloudDownload (): # ЭТА КЭЭМЕЛ КЕЙС
+    options = {
+        'webdav_hostname' : secret.davlink,
+        'webdav_login' : secret.davlogin,
+        'webdav_password' : secret.davpass,
+        'disable_check': True #иначе ломается
+    }
+    client = Client(options)
+    client.download("minecraft/config", minecraft_config_path)
+    client.download("minecraft/mods", minecraft_mods_path)
+    download_from_cloud.config(text="Готово")
+
+    
 # Функция для завершения установки
 def on_installation_complete():
     global is_game_installed
@@ -124,6 +142,9 @@ nickname_entry.pack(pady=5)
 launch_button = tk.Button(frame, text="Играть", command=launch_game, state=tk.DISABLED)
 launch_button.pack(pady=10)
 
+# Кнопка скачивания модов
+download_from_cloud = tk.Button(frame, text="Скачать моды", command=cloudDownload)
+download_from_cloud.pack(pady=10)
 # Кнопка начала установки игры
 install_button = tk.Button(frame, text="Начать установку", command=install_game)
 install_button.pack(pady=10)
