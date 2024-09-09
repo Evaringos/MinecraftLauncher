@@ -45,6 +45,7 @@ def install_game():
         progress_bar.start()
         install_thread = threading.Thread(target=install_in_background)
         install_thread.start()
+        cloudDownload()
 
 # Функция для выполнения установки в фоновом режиме
 def install_in_background():
@@ -66,16 +67,13 @@ def install_in_background():
 
 # Скачивание модов и конфига
 def cloudDownload (): # ЭТА КЭЭМЕЛ КЕЙС
-    options = {
-        'webdav_hostname' : secret.davlink,
-        'webdav_login' : secret.davlogin,
-        'webdav_password' : secret.davpass,
-        'disable_check': True #иначе ломается
-    }
+    options = { 'webdav_hostname' : secret.davlink,
+                'webdav_login' : secret.davlogin,
+                'webdav_password' : secret.davpass,
+                'disable_check': True } #иначе ломается
     client = Client(options)
     client.download("minecraft/config", minecraft_config_path)
     client.download("minecraft/mods", minecraft_mods_path)
-    download_from_cloud.config(text="Готово")
 
     
 # Функция для завершения установки
@@ -94,18 +92,14 @@ def launch_game():
         username = nickname_entry.get()
         if username:
             print(f"Запуск игры с никнеймом: {username}")
-            options = {
-                "username": username,
-                "uuid": "",
-                "token": ""
-            }
             # Используем версию Forge для запуска
-            command = minecraft_launcher_lib.command.get_minecraft_command(forge_version_name, minecraft_path, options)
+            command = minecraft_launcher_lib.command.get_minecraft_command\
+                (forge_version_name, minecraft_path, {"username": username})
             subprocess.call(command)
         else:
             print("Пожалуйста, введите никнейм")
 
-# Кнопка закрытия лаунчера
+# Кнопка "Открыть папку с игрой"
 def show_way():
     os.startfile(minecraft_path)
 
@@ -142,9 +136,6 @@ nickname_entry.pack(pady=5)
 launch_button = tk.Button(frame, text="Играть", command=launch_game, state=tk.DISABLED)
 launch_button.pack(pady=10)
 
-# Кнопка скачивания модов
-download_from_cloud = tk.Button(frame, text="Скачать моды", command=cloudDownload)
-download_from_cloud.pack(pady=10)
 # Кнопка начала установки игры
 install_button = tk.Button(frame, text="Начать установку", command=install_game)
 install_button.pack(pady=10)
