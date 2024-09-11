@@ -47,9 +47,9 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setWindowTitle("AoH Launcher")
         MainWindow.setWindowIcon(Icon())
-        MainWindow.resize(500, 680)
-        MainWindow.setMinimumSize(QtCore.QSize(500, 680))
-        MainWindow.setMaximumSize(QtCore.QSize(500, 680))
+        MainWindow.resize(500, 630)
+        MainWindow.setMinimumSize(QtCore.QSize(500, 630))
+        MainWindow.setMaximumSize(QtCore.QSize(500, 630))
         MainWindow.setStyleSheet("QWidget { background-color: #191919; color: #f2b036; }")
 
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -105,11 +105,6 @@ class Ui_MainWindow(object):
         # Привязываем меню к кнопке
         self.SettingsButton.setMenu(self.settings_menu)
 
-        # Другие кнопки в тулбаре
-        #self.patchButton = QtWidgets.QPushButton()
-        #self.patchButton.setFixedSize(32, 32)
-        #self.patchButton.setIcon(QIcon(icon_paths["patch"]))
-        #self.toolbar.addWidget(self.patchButton)
         # Folder with game
         self.FolderWithGame = QtWidgets.QPushButton()
         self.FolderWithGame.setFixedSize(32, 32)
@@ -157,7 +152,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.Whattsnew.sizePolicy().hasHeightForWidth())
         self.Whattsnew.setSizePolicy(sizePolicy)
-        self.Whattsnew.setMinimumSize(QtCore.QSize(0, 215))
+        self.Whattsnew.setMinimumSize(QtCore.QSize(0, 210))
         self.Whattsnew.setObjectName("Whattsnew")
         self.verticalLayout.addWidget(self.Whattsnew)
         self.Whattsnew.setStyleSheet("border-radius: 5px; border: 1px solid rgb(8, 8, 8); background-color: #1C1C1C;")
