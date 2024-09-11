@@ -1,26 +1,21 @@
 import sys
 import os
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import QIcon, QPixmap
-# ---
-from PyQt5.QtCore import QAbstractListModel, Qt
-from PyQt5.QtWidgets import QListView, QListWidgetItem
+from PyQt5.QtGui import QIcon, QDesktopServices
+from PyQt5.QtCore import QUrl
 
-# Добавить возможность переключения темы (AoH Classic; Console92)
+Console92 = True
+AoHClassic = False
 
-# Инициализация иконки
 def Icon():
     icon_path = os.path.join(os.path.dirname(__file__), 'cache', 'logo.ico')
-    icon = QIcon(icon_path)
-    return icon
+    return QIcon(icon_path)
 
-# Функция для возможности передвижения окна (Используеться только в Stretch в toolbar)
 class DraggableStretchWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setCursor(QtCore.Qt.SizeAllCursor)  # Курсор для перетаскивания
-        self.setFixedHeight(32)  # Высота должна соответствовать высоте тулбара
-
+        self.setFixedHeight(32)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self._drag_start_pos = None
         self._window_pos_at_drag_start = None
 
@@ -28,7 +23,6 @@ class DraggableStretchWidget(QtWidgets.QWidget):
         if event.button() == QtCore.Qt.LeftButton:
             self._drag_start_pos = event.globalPos()
             self._window_pos_at_drag_start = self.parentWidget().parentWidget().pos()
-            self.setCursor(QtCore.Qt.ClosedHandCursor)
 
     def mouseMoveEvent(self, event):
         if self._drag_start_pos is not None:
@@ -40,81 +34,107 @@ class DraggableStretchWidget(QtWidgets.QWidget):
         if event.button() == QtCore.Qt.LeftButton:
             self._drag_start_pos = None
             self._window_pos_at_drag_start = None
-            self.setCursor(QtCore.Qt.SizeAllCursor)
 
-# Launcher MainWindow
 class Ui_MainWindow(object):
-    # Создание конфига настроек
     def __init__(self):
         self.settings = QtCore.QSettings("AoH Launcher", "Settings")
 
-    # Функция сохранения поля username
     def save_username(self):
         self.settings.setValue("username", self.Username.text())
 
     def setupUi(self, MainWindow):
-        # Отключение дефолтного бара
-        # MainWindow.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-
-        # MainWindow название и иконка
+        MainWindow.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         MainWindow.setObjectName("MainWindow")
         MainWindow.setWindowTitle("AoH Launcher")
         MainWindow.setWindowIcon(Icon())
-
-        # MainWindow размер и его фиксация
         MainWindow.resize(500, 680)
         MainWindow.setMinimumSize(QtCore.QSize(500, 680))
         MainWindow.setMaximumSize(QtCore.QSize(500, 680))
-
-        # Dark theme
         MainWindow.setStyleSheet("QWidget { background-color: #191919; color: #f2b036; }")
 
-        # Небольшое окно внутри MainWindow для более красивой картинки
         self.centralwidget = QtWidgets.QWidget(MainWindow)
-        self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.centralwidget)
-        self.horizontalLayout.setObjectName("horizontalLayout")
         self.verticalLayout = QtWidgets.QVBoxLayout()
-        self.verticalLayout.setContentsMargins(10, 0, 10, 10) # Высота была 10, но я заменил на 0 для более красивой картинки
+        self.verticalLayout.setContentsMargins(10, 0, 10, 10)
         self.verticalLayout.setSpacing(5)
-        self.verticalLayout.setObjectName("verticalLayout")
 
-        # Toolbar для более удобного использования кнопок
+        # Toolbar
         self.toolbar = QtWidgets.QToolBar(MainWindow)
         MainWindow.addToolBar(self.toolbar)
         self.toolbar.setContentsMargins(0, 0, 0, 0)
         self.toolbar.setMovable(False)
         self.toolbar.setFixedHeight(32)
-        self.toolbar.show()
-        # Кнопки внутри тулбара
-        # Settings
-        self.SettingsButton = QtWidgets.QPushButton("Temp")
-        self.SettingsButton.setFixedHeight(32)
-        self.SettingsButton.setFixedWidth(32)
+        self.toolbar.setStyleSheet("""
+            QToolBar {
+                border: none;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, 
+                stop:0 #333333, stop:1 #000000);
+            }
+        """)
+
+        # Иконки для кнопок
+        icon_paths = {
+            "close": os.path.join(os.path.dirname(__file__), 'cache', 'close.png'),
+            "settings": os.path.join(os.path.dirname(__file__), 'cache', 'settings.png'),
+            "hide": os.path.join(os.path.dirname(__file__), 'cache', 'hide.png'),
+            "folder": os.path.join(os.path.dirname(__file__), 'cache', 'folder.png'),
+            # "patch": os.path.join(os.path.dirname(__file__), 'cache', 'patch.png')
+        }
+        game_folder_path = os.path.join(os.getenv('APPDATA'), '.AoHLauncher')
+
+        # Настройка кнопки Settings
+        self.SettingsButton = QtWidgets.QPushButton()
+        self.SettingsButton.setFixedSize(32, 32)
+        self.SettingsButton.setIcon(QIcon(icon_paths["settings"]))
         self.toolbar.addWidget(self.SettingsButton)
-        # Patch
-        self.patchButton = QtWidgets.QPushButton("Патч")
-        self.patchButton.setFixedHeight(32)
-        self.toolbar.addWidget(self.patchButton)
-        # Open Folder
-        self.FolderWithGame = QtWidgets.QPushButton("Папка с игрой")
-        self.FolderWithGame.setFixedHeight(32)
+        # Создаем выпадающее меню
+        self.settings_menu = QtWidgets.QMenu(MainWindow)
+        self.theme_menu = QtWidgets.QMenu("Themes settings", self.settings_menu)
+        self.theme_menu.setIcon(QIcon(icon_paths["settings"]))
+        # Создаем действия для меню
+        self.theme_option1 = self.theme_menu.addAction("Console92")
+        self.theme_option2 = self.theme_menu.addAction("AoH Classic")
+        self.theme_option1.setCheckable(True)
+        self.theme_option2.setCheckable(True)
+        # Подключаем слоты для действий
+        self.theme_option1.toggled.connect(lambda: self.on_theme_option_toggled(self.theme_option1))
+        self.theme_option2.toggled.connect(lambda: self.on_theme_option_toggled(self.theme_option2))
+        # Добавляем вложенное меню в основное меню
+        self.settings_menu.addMenu(self.theme_menu)
+        self.settings_menu.addAction("Credits")
+        # Привязываем меню к кнопке
+        self.SettingsButton.setMenu(self.settings_menu)
+
+        # Другие кнопки в тулбаре
+        #self.patchButton = QtWidgets.QPushButton()
+        #self.patchButton.setFixedSize(32, 32)
+        #self.patchButton.setIcon(QIcon(icon_paths["patch"]))
+        #self.toolbar.addWidget(self.patchButton)
+        # Folder with game
+        self.FolderWithGame = QtWidgets.QPushButton()
+        self.FolderWithGame.setFixedSize(32, 32)
+        self.FolderWithGame.setIcon(QIcon(icon_paths["folder"]))
         self.toolbar.addWidget(self.FolderWithGame)
-        # Stratch (Fill the space between buttons)
+        # Метод для открытия папки
+        def open_folder():
+            QDesktopServices.openUrl(QUrl.fromLocalFile(game_folder_path))
+        # Подключение метода к нажатию кнопки
+        self.FolderWithGame.clicked.connect(open_folder)
+        # Stretch
         stretch_widget = DraggableStretchWidget()
-        stretch_layout = QtWidgets.QHBoxLayout(stretch_widget)
-        stretch_layout.addStretch(50)
         self.toolbar.addWidget(stretch_widget)
-        # Close window
-        self.CloseWindow = QtWidgets.QPushButton("Temp")
-        self.CloseWindow.setFixedHeight(32)
-        self.CloseWindow.setFixedWidth(32)
-        self.toolbar.addWidget(self.CloseWindow)
-        # Hide Window
-        self.HideWindow = QtWidgets.QPushButton("Temp")
-        self.HideWindow.setFixedHeight(32)
-        self.HideWindow.setFixedWidth(32)
+        # Hide window
+        self.HideWindow = QtWidgets.QPushButton()
+        self.HideWindow.setFixedSize(32, 32)
+        self.HideWindow.setIcon(QIcon(icon_paths["hide"]))
+        self.HideWindow.clicked.connect(MainWindow.showMinimized)
         self.toolbar.addWidget(self.HideWindow)
+        # Close window
+        self.CloseWindow = QtWidgets.QPushButton()
+        self.CloseWindow.setFixedSize(32, 32)
+        self.CloseWindow.setIcon(QIcon(icon_paths["close"]))
+        self.CloseWindow.clicked.connect(MainWindow.close)
+        self.toolbar.addWidget(self.CloseWindow)
 
         # Launcher logo
         Launcher_logo = os.path.join(os.path.dirname(__file__), 'cache', 'Launcher_logo.png')

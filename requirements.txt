@@ -1,2 +1,3 @@
 PyQt5
 webdavclient3
+minecraft_launcher_lib
