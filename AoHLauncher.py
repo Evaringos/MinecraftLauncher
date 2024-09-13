@@ -1,24 +1,21 @@
-import tkinter as tk
-from tkinter import ttk
 import os
 import subprocess
 import threading
 import minecraft_launcher_lib
 from webdav3.client import Client
+from ConfigHandler import create_default_config
 import secret
+
 
 # Переменная для проверки установки игры
 is_game_installed = False
-# Переменная для хранения никнейма
-username = ""
 
 # Базовая версия игры
 base_version = "1.20.1"
 
 # Путь установки игры, модов, конфигов
-minecraft_path = os.path.join(os.getenv('APPDATA'), '.AoHLauncher')
-minecraft_mods_path = os.path.join(minecraft_path, "mods")
-minecraft_config_path = os.path.join(minecraft_path, "config")
+minecraft_path = os.path.expanduser('~/AppData/Roaming/.AoHLauncher')
+aoh_config_file = os.path.join(minecraft_path, "AoHConfig.ini")
 # Переменная для хранения версии Forge
 forge_version_name = None
 
@@ -34,7 +31,10 @@ def check_game_installed():
             if version["id"].startswith(base_version + "-forge"):
                 forge_version_name = version["id"]
                 break
-        launch_button.config(state=tk.NORMAL)
+
+# Есть ли файл конфигурации
+def check_configfile():
+    if not os.path.isfile(aoh_config_file): create_default_config()
 
 # Функция для установки игры
 def install_game():
@@ -42,7 +42,6 @@ def install_game():
         print("Игра уже установлена")
         on_installation_complete()
     else:
-        progress_bar.start()
         install_thread = threading.Thread(target=install_in_background)
         install_thread.start()
         cloudDownload()
@@ -72,24 +71,20 @@ def cloudDownload (): # ЭТА КЭЭМЕЛ КЕЙС
                 'webdav_password' : secret.davpass,
                 'disable_check': True } #иначе ломается
     client = Client(options)
-    client.download("minecraft/config", minecraft_config_path)
-    client.download("minecraft/mods", minecraft_mods_path)
+    client.download("minecraft/config", os.path.join(minecraft_path, "config"))
+    client.download("minecraft/mods", os.path.join(minecraft_path, "mods"))
 
     
 # Функция для завершения установки
 def on_installation_complete():
     global is_game_installed
-    progress_bar.stop()
     is_game_installed = True
-    launch_button.config(state=tk.NORMAL)
     print("Игра и Forge установлены")
 
 # Кнопка запуска игры
-def launch_game():
-    global username
-    check_game_installed() # Temp line
+def launch_game(username):
+    # check_game_installed() # Temp line
     if is_game_installed and forge_version_name:
-        username = nickname_entry.get()
         if username:
             print(f"Запуск игры с никнеймом: {username}")
             # Используем версию Forge для запуска
@@ -99,58 +94,10 @@ def launch_game():
         else:
             print("Пожалуйста, введите никнейм")
 
-# Кнопка "Открыть папку с игрой"
-def show_way():
-    os.startfile(minecraft_path)
-
-# Выравнивание позиции открытия окна и размер открываемого окна
-def center_window(window, width=300, height=300):
-    screen_width = window.winfo_screenwidth()
-    screen_height = window.winfo_screenheight()
-    x = (screen_width // 2) - (width // 2)
-    y = (screen_height // 2) - (height // 2)
-    window.geometry(f'{width}x{height}+{x}+{y}')
-
-# Окно и название окна
-root = tk.Tk()
-root.title("AoH Launcher")
-
-# Установка иконки
-icon_path = os.path.join(os.path.dirname(__file__), 'cache', 'logo.ico')
-root.iconbitmap(icon_path)
-
-# Центрируем окно
-center_window(root)
-
-# Создайте фрейм для выравнивания кнопок
-frame = tk.Frame(root)
-frame.pack(expand=True, pady=(20, 0))
-
-# Поле для ввода никнейма
-nickname_label = tk.Label(frame, text="Введите никнейм:")
-nickname_label.pack(pady=5)
-nickname_entry = tk.Entry(frame)
-nickname_entry.pack(pady=5)
-
-# Кнопка входа в игру
-launch_button = tk.Button(frame, text="Играть", command=launch_game, state=tk.DISABLED)
-launch_button.pack(pady=10)
-
-# Кнопка начала установки игры
-install_button = tk.Button(frame, text="Начать установку", command=install_game)
-install_button.pack(pady=10)
-
-# Индикатор прогресса
-progress_bar = ttk.Progressbar(frame, mode='indeterminate')
-progress_bar.pack(pady=10)
-
-# Кнопка открытия пути проводника
-showway_button = tk.Button(frame, text="Открыть папку с игрой", command=show_way)
-showway_button.pack(pady=10)
 
 print(f"Путь установки: {minecraft_path}")
 
 # Проверяем, установлена ли игра при запуске лаунчера
 check_game_installed()
+check_configfile()
 
-root.mainloop()

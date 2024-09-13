@@ -1,11 +1,17 @@
 import sys
 import os
+import AoHLauncher
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QIcon, QDesktopServices
 from PyQt5.QtCore import QUrl
+from ConfigHandler import update_config, read_config, create_default_config
+import ConfigHandler
+
+
 
 Console92 = True
 AoHClassic = False
+config = read_config()
 
 def Icon():
     icon_path = os.path.join(os.path.dirname(__file__), 'cache', 'logo.ico')
@@ -39,8 +45,13 @@ class Ui_MainWindow(object):
     def __init__(self):
         self.settings = QtCore.QSettings("AoH Launcher", "Settings")
 
-    def save_username(self):
-        self.settings.setValue("username", self.Username.text())
+    def launch_game_pressed(self):
+        AoHLauncher.launch_game(self.Username.text())
+
+    def save_username_and_exit(self):
+        # self.settings.setValue("username", self.Username.text())
+        update_config("Launcher", "Username", self.Username.text())
+        MainWindow.close()
 
     def setupUi(self, MainWindow):
         MainWindow.setWindowFlags(QtCore.Qt.FramelessWindowHint)
@@ -105,7 +116,7 @@ class Ui_MainWindow(object):
         # Привязываем меню к кнопке
         self.SettingsButton.setMenu(self.settings_menu)
 
-        # Folder with game
+        # Папка с игрой
         self.FolderWithGame = QtWidgets.QPushButton()
         self.FolderWithGame.setFixedSize(32, 32)
         self.FolderWithGame.setIcon(QIcon(icon_paths["folder"]))
@@ -118,17 +129,17 @@ class Ui_MainWindow(object):
         # Stretch
         stretch_widget = DraggableStretchWidget()
         self.toolbar.addWidget(stretch_widget)
-        # Hide window
+        # Hide window button
         self.HideWindow = QtWidgets.QPushButton()
         self.HideWindow.setFixedSize(32, 32)
         self.HideWindow.setIcon(QIcon(icon_paths["hide"]))
         self.HideWindow.clicked.connect(MainWindow.showMinimized)
         self.toolbar.addWidget(self.HideWindow)
-        # Close window
+        # Close window button
         self.CloseWindow = QtWidgets.QPushButton()
         self.CloseWindow.setFixedSize(32, 32)
         self.CloseWindow.setIcon(QIcon(icon_paths["close"]))
-        self.CloseWindow.clicked.connect(MainWindow.close)
+        self.CloseWindow.clicked.connect(self.save_username_and_exit)
         self.toolbar.addWidget(self.CloseWindow)
 
         # Launcher logo
@@ -178,9 +189,9 @@ class Ui_MainWindow(object):
         self.Username.setDragEnabled(False)
         self.Username.setReadOnly(False)
         self.Username.setClearButtonEnabled(False)
-        self.Username.setText(self.settings.value("username", ""))
-        self.verticalLayout.addWidget(self.Username)
-        self.Username.textChanged.connect(self.save_username)
+        self.Username.setText(config["Launcher"]["Username"])
+        self.verticalLayout.addWidget(self.Username)        
+#        self.Username.textChanged.connect(self.save_username)
         # self.Username.setStyleSheet("border-radius: 5px; border: 1px solid rgb(51, 51, 51); background-color: #CCCCCC; padding: 2px; color: #000000;")
         self.Username.setStyleSheet("""
             QLineEdit {
@@ -209,7 +220,7 @@ class Ui_MainWindow(object):
         spacerItem2 = QtWidgets.QSpacerItem(20, 50, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.verticalLayout.addItem(spacerItem2)
 
-        # Кнопка запуска игры
+        # Кнопка запуска игры Play button
         self.PlayButton = QtWidgets.QPushButton(self.centralwidget)
         self.PlayButton.setMinimumSize(QtCore.QSize(150, 40))
         self.PlayButton.setObjectName("PlayButton")
@@ -220,6 +231,7 @@ class Ui_MainWindow(object):
         font.setPointSize(18)
         font.setWeight(QtGui.QFont.Bold)  # или font.setWeight(75) для более тонкого шрифта
         self.PlayButton.setFont(font)
+        self.PlayButton.clicked.connect(self.launch_game_pressed)  
         self.verticalLayout.addWidget(self.PlayButton)
         # self.PlayButton.setStyleSheet("font-family: 'Consolas', monospace; font-size: 18px;")
         self.PlayButton.setStyleSheet("""
