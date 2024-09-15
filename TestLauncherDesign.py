@@ -190,17 +190,41 @@ class Ui_MainWindow(object):
         #spacerItem = QtWidgets.QSpacerItem(20, 50, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         #self.verticalLayout.addItem(spacerItem)
 
-        # Лист последних обновлений лаунчера
-        self.Whattsnew = QtWidgets.QListView(self.centralwidget)
+        # Консоль для более отзывчивого интерфейса
+        self.Console = QtWidgets.QListView(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.Whattsnew.sizePolicy().hasHeightForWidth())
-        self.Whattsnew.setSizePolicy(sizePolicy)
-        self.Whattsnew.setMinimumSize(QtCore.QSize(0, 210))
-        self.Whattsnew.setObjectName("Whattsnew")
-        self.verticalLayout.addWidget(self.Whattsnew)
-        self.Whattsnew.setStyleSheet("border-radius: 5px; border: 1px solid rgb(8, 8, 8); background-color: #1C1C1C;")
+        sizePolicy.setHeightForWidth(self.Console.sizePolicy().hasHeightForWidth())
+        self.Console.setSizePolicy(sizePolicy)
+        self.Console.setMinimumSize(QtCore.QSize(0, 210))
+        self.Console.setObjectName("Console")
+        self.verticalLayout.addWidget(self.Console)
+        self.Console.setStyleSheet("border-radius: 5px; border: 1px solid rgb(8, 8, 8); background-color: #1C1C1C;")
+        # Модель данных для QListView
+        self.model = QtCore.QStringListModel()  # Исправлено: QStringListModel находится в QtCore
+        self.Console.setModel(self.model)
+        # Пример использования
+        self.add_message_to_console("Launcher started")
+        self.add_message_to_console("Loading mods...")
+        # Симуляция действий, выводящих данные в консоль
+        self.simulate_action()
+
+    def add_message_to_console(self, message):
+        """Добавляет сообщение в консоль (нижняя часть списка)."""
+        # Получаем текущие строки из модели
+        current_list = self.model.stringList()
+        # Добавляем новое сообщение
+        current_list.append(message)
+        # Устанавливаем обновленный список
+        self.model.setStringList(current_list)
+        # Прокрутка вниз к последнему сообщению
+        self.Console.scrollToBottom()
+
+    def simulate_action(self):
+        """Пример действия, вызывающего вывод в консоль."""
+        # Допустим, через какое-то время выводим ещё одно сообщение
+        QtCore.QTimer.singleShot(2000, lambda: self.add_message_to_console("Mods loaded successfully."))
 
         # Spacer
         spacerItem1 = QtWidgets.QSpacerItem(100, 50, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
