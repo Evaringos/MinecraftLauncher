@@ -4,7 +4,7 @@ import AoHLauncher
 def create_default_config():
     config = configparser.ConfigParser()
     config['Launcher'] = {
-        'username': 'John'
+        'username': ''
     }
     with open(AoHLauncher.aoh_config_file, 'w') as configfile:
         config.write(configfile)
@@ -25,10 +25,6 @@ def update_config(section, key, new_value):
     if key not in config[section]:
         raise ValueError(f"Ключ '{key}' не найден в секции '{section}'")
     
-    # if section not in config:
-        # config[section] = {}
-        # config[section][key] = value
-
     config[section][key] = new_value
         
     with open(AoHLauncher.aoh_config_file, 'w') as configfile:

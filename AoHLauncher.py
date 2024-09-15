@@ -90,7 +90,8 @@ def launch_game(username):
             # Используем версию Forge для запуска
             command = minecraft_launcher_lib.command.get_minecraft_command\
                 (forge_version_name, minecraft_path, {"username": username})
-            subprocess.call(command)
+            CREATE_NO_WINDOW = 0x08000000
+            subprocess.call(command, creationflags=CREATE_NO_WINDOW)
         else:
             print("Пожалуйста, введите никнейм")
 

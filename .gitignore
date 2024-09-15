@@ -1,7 +1,11 @@
 /logs
 /config
 /schematics
+/build
+/__pycache__
+/dist
 #*.*#
 *.*~
+*.spec
 secret.py
-__pycache__
+AoHLauncher.exe

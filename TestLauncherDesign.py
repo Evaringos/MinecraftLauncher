@@ -8,14 +8,14 @@ from ConfigHandler import update_config, read_config, create_default_config
 import ConfigHandler
 
 
-
 Console92 = True
 AoHClassic = False
 config = read_config()
 
-def Icon():
-    icon_path = os.path.join(os.path.dirname(__file__), 'cache', 'logo.ico')
-    return QIcon(icon_path)
+# def Icon():
+#     icon_path = os.path.join(os.path.dirname(__file__), 'cache')
+    
+#     return QIcon(icon_path)
 
 class DraggableStretchWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -46,22 +46,35 @@ class Ui_MainWindow(object):
         self.settings = QtCore.QSettings("AoH Launcher", "Settings")
 
     def launch_game_pressed(self):
+        MainWindow.hide()
+        # if sys.platform == 'win32':
+        #     CREATE_NO_WINDOW = 0x08000000
+        # else:
+        #     CREATE_NO_WINDOW = 0
         AoHLauncher.launch_game(self.Username.text())
+        MainWindow.show()
 
     def save_username_and_exit(self):
-        # self.settings.setValue("username", self.Username.text())
         update_config("Launcher", "Username", self.Username.text())
         MainWindow.close()
 
     def setupUi(self, MainWindow):
-        MainWindow.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        icon_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'cache', 'aoh_icon.ico'))
+        app_icon = QtGui.QIcon(icon_path)
+        app.setWindowIcon(app_icon)
+        MainWindow.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint)
+
         MainWindow.setObjectName("MainWindow")
         MainWindow.setWindowTitle("AoH Launcher")
-        MainWindow.setWindowIcon(Icon())
+        # QtWidgets.QApplication.setWindowIcon(QtGui.QIcon(os.path.join('cache', 'aoh_logo_256.png')))
+        # MainWindow.setWindowIcon(Icon())
+        # QtWidgets.QApplication.setWindowIcon(Icon())
         MainWindow.resize(500, 630)
         MainWindow.setMinimumSize(QtCore.QSize(500, 630))
         MainWindow.setMaximumSize(QtCore.QSize(500, 630))
         MainWindow.setStyleSheet("QWidget { background-color: #191919; color: #f2b036; }")
+        # Add shadow
+        # MainWindow.QtWidgets.QGraphicsDropShadowEffect(self)
 
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.centralwidget)
@@ -238,7 +251,7 @@ class Ui_MainWindow(object):
             QPushButton {
                 border-radius: 5px;
                 border: 1px solid rgb(8, 8, 8);
-                background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                     stop: 0 #1C1C1C, stop: 1 #151515);
                 padding: 2px;
                 font-family: 'Consolas', monospace;
