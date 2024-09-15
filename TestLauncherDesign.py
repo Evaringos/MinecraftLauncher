@@ -102,7 +102,7 @@ class Ui_MainWindow(object):
             "settings": os.path.join(os.path.dirname(__file__), 'cache', 'settings.png'),
             "hide": os.path.join(os.path.dirname(__file__), 'cache', 'hide.png'),
             "folder": os.path.join(os.path.dirname(__file__), 'cache', 'folder.png'),
-            # "patch": os.path.join(os.path.dirname(__file__), 'cache', 'patch.png')
+            "refresh": os.path.join(os.path.dirname(__file__), 'cache', 'folder.png')
         }
         game_folder_path = os.path.join(os.getenv('APPDATA'), '.AoHLauncher')
 
@@ -139,6 +139,17 @@ class Ui_MainWindow(object):
             QDesktopServices.openUrl(QUrl.fromLocalFile(game_folder_path))
         # Подключение метода к нажатию кнопки
         self.FolderWithGame.clicked.connect(open_folder)
+
+        # Обновление модов (возможно временная функция)
+        self.Refresh = QtWidgets.QPushButton()
+        self.Refresh.setFixedSize(32, 32)
+        self.Refresh.setIcon(QIcon(icon_paths["refresh"]))
+        self.toolbar.addWidget(self.Refresh)
+
+        # def refresh_mods():
+
+        # self.Refresh.clicked.connect(refresh_mods)
+
         # Stretch
         stretch_widget = DraggableStretchWidget()
         self.toolbar.addWidget(stretch_widget)
