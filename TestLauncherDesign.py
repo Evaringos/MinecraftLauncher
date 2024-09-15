@@ -12,11 +12,6 @@ Console92 = True
 AoHClassic = False
 config = read_config()
 
-# def Icon():
-#     icon_path = os.path.join(os.path.dirname(__file__), 'cache')
-    
-#     return QIcon(icon_path)
-
 class DraggableStretchWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -47,10 +42,6 @@ class Ui_MainWindow(object):
 
     def launch_game_pressed(self):
         MainWindow.hide()
-        # if sys.platform == 'win32':
-        #     CREATE_NO_WINDOW = 0x08000000
-        # else:
-        #     CREATE_NO_WINDOW = 0
         AoHLauncher.launch_game(self.Username.text())
         MainWindow.show()
 
@@ -66,16 +57,11 @@ class Ui_MainWindow(object):
 
         MainWindow.setObjectName("MainWindow")
         MainWindow.setWindowTitle("AoH Launcher")
-        # QtWidgets.QApplication.setWindowIcon(QtGui.QIcon(os.path.join('cache', 'aoh_logo_256.png')))
-        # MainWindow.setWindowIcon(Icon())
-        # QtWidgets.QApplication.setWindowIcon(Icon())
         MainWindow.resize(500, 595)
         MainWindow.setMinimumSize(QtCore.QSize(500, 595))
         MainWindow.setMaximumSize(QtCore.QSize(500, 595))
         MainWindow.setStyleSheet("QWidget { background-color: #191919; color: #f2b036; }")
-        # Add shadow
-        # MainWindow.QtWidgets.QGraphicsDropShadowEffect(self)
-
+        
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.centralwidget)
         self.verticalLayout = QtWidgets.QVBoxLayout()
@@ -99,11 +85,12 @@ class Ui_MainWindow(object):
 
         # Иконки для кнопок
         icon_paths = {
-            "close": os.path.join(os.path.dirname(__file__), 'cache', 'close.png'),
-            "settings": os.path.join(os.path.dirname(__file__), 'cache', 'settings.png'),
-            "hide": os.path.join(os.path.dirname(__file__), 'cache', 'hide.png'),
-            "folder": os.path.join(os.path.dirname(__file__), 'cache', 'folder.png'),
-            "refresh": os.path.join(os.path.dirname(__file__), 'cache', 'folder.png')
+            "close": os.path.join('cache', 'icons', 'close.svg'),
+            "settings": os.path.join('cache', 'icons', 'cogwheel.svg'),
+            "hide": os.path.join('cache', 'icons', 'hide.svg'),
+            "folder": os.path.join('cache', 'icons', 'folder.svg'),
+            "refresh": os.path.join('cache', 'icons', 'reload.svg'),
+            "globe": os.path.join('cache', 'icons', 'globe.svg')
         }
         game_folder_path = os.path.join(os.getenv('APPDATA'), '.AoHLauncher')
 
@@ -112,12 +99,14 @@ class Ui_MainWindow(object):
         self.SettingsButton.setFixedSize(32, 32)
         self.SettingsButton.setIcon(QIcon(icon_paths["settings"]))
         self.toolbar.addWidget(self.SettingsButton)
-        # Создаем выпадающее меню
+        
+        # Создаем выпадающее меню (dropdown menu)
         self.settings_menu = QtWidgets.QMenu(MainWindow)
         self.theme_menu = QtWidgets.QMenu("Themes settings", self.settings_menu)
         self.theme_menu.setIcon(QIcon(icon_paths["settings"]))
         self.language_menu = QtWidgets.QMenu("Language settings", self.settings_menu)
         #self.language_menu.setIcon(QIcon(icon_paths["settings"]))
+        
         # Создаем действия для меню
         self.theme_option1 = self.theme_menu.addAction("Console92")
         self.theme_option2 = self.theme_menu.addAction("AoH Classic")
@@ -127,17 +116,19 @@ class Ui_MainWindow(object):
         self.theme_option2.setCheckable(True)
         self.language_option1.setCheckable(True)
         self.language_option2.setCheckable(True)
+        
         # Подключаем слоты для действий
         self.theme_option1.toggled.connect(lambda: self.on_theme_option_toggled(self.theme_option1))
         self.theme_option2.toggled.connect(lambda: self.on_theme_option_toggled(self.theme_option2))
         self.language_option1.toggled.connect(lambda: self.on_theme_option_toggled(self.language_option1))
         self.language_option2.toggled.connect(lambda: self.on_theme_option_toggled(self.language_option2))
+        
         # Добавляем вложенное меню в основное меню
         self.settings_menu.addMenu(self.theme_menu)
         self.settings_menu.addMenu(self.language_menu)
         self.settings_menu.addAction("Credits")
-        # Привязываем меню к кнопке
-        self.SettingsButton.setMenu(self.settings_menu)
+        
+        self.SettingsButton.setMenu(self.settings_menu) # Привязываем меню к кнопке
 
         # Папка с игрой
         self.FolderWithGame = QtWidgets.QPushButton()

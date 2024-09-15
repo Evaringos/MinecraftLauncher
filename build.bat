@@ -1,3 +1,4 @@
+del AoHLauncher.exe
 pyinstaller --noconfirm --noconsole --onefile ^
 	--name=AoHLauncher ^
 	--distpath=. ^
