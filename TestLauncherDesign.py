@@ -69,9 +69,9 @@ class Ui_MainWindow(object):
         # QtWidgets.QApplication.setWindowIcon(QtGui.QIcon(os.path.join('cache', 'aoh_logo_256.png')))
         # MainWindow.setWindowIcon(Icon())
         # QtWidgets.QApplication.setWindowIcon(Icon())
-        MainWindow.resize(500, 630)
-        MainWindow.setMinimumSize(QtCore.QSize(500, 630))
-        MainWindow.setMaximumSize(QtCore.QSize(500, 630))
+        MainWindow.resize(500, 595)
+        MainWindow.setMinimumSize(QtCore.QSize(500, 595))
+        MainWindow.setMaximumSize(QtCore.QSize(500, 595))
         MainWindow.setStyleSheet("QWidget { background-color: #191919; color: #f2b036; }")
         # Add shadow
         # MainWindow.QtWidgets.QGraphicsDropShadowEffect(self)
@@ -116,16 +116,25 @@ class Ui_MainWindow(object):
         self.settings_menu = QtWidgets.QMenu(MainWindow)
         self.theme_menu = QtWidgets.QMenu("Themes settings", self.settings_menu)
         self.theme_menu.setIcon(QIcon(icon_paths["settings"]))
+        self.language_menu = QtWidgets.QMenu("Language settings", self.settings_menu)
+        #self.language_menu.setIcon(QIcon(icon_paths["settings"]))
         # Создаем действия для меню
         self.theme_option1 = self.theme_menu.addAction("Console92")
         self.theme_option2 = self.theme_menu.addAction("AoH Classic")
+        self.language_option1 = self.language_menu.addAction("English")
+        self.language_option2 = self.language_menu.addAction("Русский")
         self.theme_option1.setCheckable(True)
         self.theme_option2.setCheckable(True)
+        self.language_option1.setCheckable(True)
+        self.language_option2.setCheckable(True)
         # Подключаем слоты для действий
         self.theme_option1.toggled.connect(lambda: self.on_theme_option_toggled(self.theme_option1))
         self.theme_option2.toggled.connect(lambda: self.on_theme_option_toggled(self.theme_option2))
+        self.language_option1.toggled.connect(lambda: self.on_theme_option_toggled(self.language_option1))
+        self.language_option2.toggled.connect(lambda: self.on_theme_option_toggled(self.language_option2))
         # Добавляем вложенное меню в основное меню
         self.settings_menu.addMenu(self.theme_menu)
+        self.settings_menu.addMenu(self.language_menu)
         self.settings_menu.addAction("Credits")
         # Привязываем меню к кнопке
         self.SettingsButton.setMenu(self.settings_menu)
@@ -229,17 +238,6 @@ class Ui_MainWindow(object):
                 color: #f2b036;
             }
         """)
-
-        # Поле выбора версии для запуска
-        self.VersionName = QtWidgets.QComboBox(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.VersionName.sizePolicy().hasHeightForWidth())
-        self.VersionName.setSizePolicy(sizePolicy)
-        self.VersionName.setMinimumSize(QtCore.QSize(100, 35))
-        self.VersionName.setObjectName("VersionName")
-        self.verticalLayout.addWidget(self.VersionName)
         
         # Spacer
         spacerItem2 = QtWidgets.QSpacerItem(20, 50, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
