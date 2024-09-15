@@ -88,6 +88,7 @@ class Ui_MainWindow(object):
         self.toolbar.setContentsMargins(0, 0, 0, 0)
         self.toolbar.setMovable(False)
         self.toolbar.setFixedHeight(32)
+        self.toolbar.setContextMenuPolicy(QtCore.Qt.PreventContextMenu) # Отключение встроенной функции удаления тулбара
         self.toolbar.setStyleSheet("""
             QToolBar {
                 border: none;
