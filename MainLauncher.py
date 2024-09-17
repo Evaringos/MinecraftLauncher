@@ -51,6 +51,10 @@ class DraggableStretchWidget(QtWidgets.QWidget):
             self._drag_start_pos = None
             self._window_pos_at_drag_start = None
 
+class NoClickModel(QtCore.QStringListModel):
+    def flags(self, index):
+        return QtCore.Qt.NoItemFlags
+
 class Ui_MainWindow(object):
     def __init__(self):
         self.settings = QtCore.QSettings("AoH Launcher", "Settings")
@@ -238,29 +242,20 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.Console)
         self.Console.setStyleSheet("border-radius: 5px; border: 1px solid rgb(8, 8, 8); background-color: #1C1C1C;")
         # Модель данных для QListView
-        self.model = QtCore.QStringListModel()  # Исправлено: QStringListModel находится в QtCore
+        self.model = NoClickModel()
         self.Console.setModel(self.model)
-        # Пример использования
-        self.add_message_to_console("Launcher started")
-        self.add_message_to_console("Loading mods...")
-        # Симуляция действий, выводящих данные в консоль
-        self.simulate_action()
+        self.Console.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.add_message_to_console("Launcher has started")
 
     def add_message_to_console(self, message):
-        """Добавляет сообщение в консоль (нижняя часть списка)."""
-        # Получаем текущие строки из модели
         current_list = self.model.stringList()
-        # Добавляем новое сообщение
         current_list.append(message)
-        # Устанавливаем обновленный список
         self.model.setStringList(current_list)
-        # Прокрутка вниз к последнему сообщению
         self.Console.scrollToBottom()
-
-    def simulate_action(self):
-        """Пример действия, вызывающего вывод в консоль."""
-        # Допустим, через какое-то время выводим ещё одно сообщение
-        QtCore.QTimer.singleShot(2000, lambda: self.add_message_to_console("Mods loaded successfully."))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(11)
+        self.Console.setFont(font)
 
         # Spacer
         spacerItem1 = QtWidgets.QSpacerItem(100, 50, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
