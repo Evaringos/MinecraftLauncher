@@ -2,15 +2,30 @@ import sys
 import os
 import AoHLauncher
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import QIcon, QDesktopServices
-from PyQt5.QtCore import QUrl
+from PyQt5.QtGui import QActionEvent, QIcon, QDesktopServices, QPainter
+from PyQt5.QtCore import QUrl, QSize
+from PyQt5.QtSvg import QSvgWidget
 from ConfigHandler import update_config, read_config, create_default_config
-import ConfigHandler
+from Themes import Theme
 
-
-Console92 = True
-AoHClassic = False
 config = read_config()
+
+# Класс для отображение векторных иконок
+class ColoredSvgWidget (QSvgWidget):
+    def __init__(self, filepath, color, size, parent=None):
+        super().__init__(parent)
+        self.load(filepath)
+        self.setFixedSize(size)
+        self.color = color
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+
+        self.renderer().render(painter)
+
+        painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
+        painter.fillRect(self.rect(), self.color)
 
 class DraggableStretchWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -39,6 +54,13 @@ class DraggableStretchWidget(QtWidgets.QWidget):
 class Ui_MainWindow(object):
     def __init__(self):
         self.settings = QtCore.QSettings("AoH Launcher", "Settings")
+        
+    def update_theme(self, theme=None):
+        CurTheme = Theme()  # AoHClassic по дефолту
+        if theme :
+            CurTheme.SetTheme(theme)
+        MainWindow.setStyleSheet(f"background-color: {CurTheme.ColBg}; color: {CurTheme.ColAccent};")
+
 
     def launch_game_pressed(self):
         MainWindow.hide()
@@ -53,6 +75,7 @@ class Ui_MainWindow(object):
         icon_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'cache', 'aoh_icon.ico'))
         app_icon = QtGui.QIcon(icon_path)
         app.setWindowIcon(app_icon)
+        self.update_theme()
         MainWindow.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint)
 
         MainWindow.setObjectName("MainWindow")
@@ -60,7 +83,6 @@ class Ui_MainWindow(object):
         MainWindow.resize(500, 595)
         MainWindow.setMinimumSize(QtCore.QSize(500, 595))
         MainWindow.setMaximumSize(QtCore.QSize(500, 595))
-        MainWindow.setStyleSheet("QWidget { background-color: #191919; color: #f2b036; }")
         
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.centralwidget)
@@ -90,7 +112,9 @@ class Ui_MainWindow(object):
             "hide": os.path.join('cache', 'icons', 'hide.svg'),
             "folder": os.path.join('cache', 'icons', 'folder.svg'),
             "refresh": os.path.join('cache', 'icons', 'reload.svg'),
-            "globe": os.path.join('cache', 'icons', 'globe.svg')
+            "globe": os.path.join('cache', 'icons', 'globe.svg'),
+            "brush": os.path.join('cache', 'icons', 'brush.svg'),
+            "info": os.path.join('cache', 'icons', 'info.svg')
         }
         game_folder_path = os.path.join(os.getenv('APPDATA'), '.AoHLauncher')
 
@@ -100,28 +124,49 @@ class Ui_MainWindow(object):
         self.SettingsButton.setIcon(QIcon(icon_paths["settings"]))
         self.toolbar.addWidget(self.SettingsButton)
         
+
         # Создаем выпадающее меню (dropdown menu)
         self.settings_menu = QtWidgets.QMenu(MainWindow)
         self.theme_menu = QtWidgets.QMenu("Themes settings", self.settings_menu)
-        self.theme_menu.setIcon(QIcon(icon_paths["settings"]))
+        self.theme_menu.setIcon(QIcon(icon_paths["brush"]))
         self.language_menu = QtWidgets.QMenu("Language settings", self.settings_menu)
-        #self.language_menu.setIcon(QIcon(icon_paths["settings"]))
+        self.language_menu.setIcon(QIcon(icon_paths["globe"]))
+
+        # Создаём группу действий для темы
+        self.theme_menu_group = QtWidgets.QActionGroup(MainWindow)
+        self.theme_menu_group.setExclusive(True)
         
         # Создаем действия для меню
-        self.theme_option1 = self.theme_menu.addAction("Console92")
-        self.theme_option2 = self.theme_menu.addAction("AoH Classic")
+        self.theme_option1 = self.theme_menu_group.addAction("AoH Classic")
+        self.theme_option2 = self.theme_menu_group.addAction("Console92")
+        self.theme_option1.setChecked(True)
+
+        self.theme_menu.addAction(self.theme_option1)
+        self.theme_menu.addAction(self.theme_option2)        
+    
+        self.theme_option1.setCheckable(True)
+        self.theme_option1.setChecked(True) #Галочка по дефолту
+        self.theme_option2.setCheckable(True)
+
+
+
+
+        
         self.language_option1 = self.language_menu.addAction("English")
         self.language_option2 = self.language_menu.addAction("Русский")
-        self.theme_option1.setCheckable(True)
-        self.theme_option2.setCheckable(True)
         self.language_option1.setCheckable(True)
+        self.language_option1.setChecked(True)
         self.language_option2.setCheckable(True)
+
         
-        # Подключаем слоты для действий
-        self.theme_option1.toggled.connect(lambda: self.on_theme_option_toggled(self.theme_option1))
-        self.theme_option2.toggled.connect(lambda: self.on_theme_option_toggled(self.theme_option2))
+        # Подключаем слоты для действий. triggered - действие только когда галка ставится
+        self.theme_option1.triggered.connect(lambda: self.update_theme("AoHClassic"))
+        self.theme_option2.triggered.connect(lambda: self.update_theme("Classic92"))
         self.language_option1.toggled.connect(lambda: self.on_theme_option_toggled(self.language_option1))
         self.language_option2.toggled.connect(lambda: self.on_theme_option_toggled(self.language_option2))
+
+
+
         
         # Добавляем вложенное меню в основное меню
         self.settings_menu.addMenu(self.theme_menu)
