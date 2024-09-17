@@ -1,6 +1,6 @@
 import sys
 import os
-import AoHLauncher
+import GameLauncher
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QActionEvent, QIcon, QDesktopServices, QPainter
 from PyQt5.QtCore import QUrl, QSize
@@ -64,7 +64,7 @@ class Ui_MainWindow(object):
 
     def launch_game_pressed(self):
         MainWindow.hide()
-        AoHLauncher.launch_game(self.Username.text())
+        GameLauncher.launch_game(self.Username.text())
         MainWindow.show()
 
     def save_username_and_exit(self):

@@ -1,17 +1,17 @@
 import configparser
-import AoHLauncher
+import GameLauncher
 
 def create_default_config():
     config = configparser.ConfigParser()
     config['Launcher'] = {
         'username': ''
     }
-    with open(AoHLauncher.aoh_config_file, 'w') as configfile:
+    with open(GameLauncher.aoh_config_file, 'w') as configfile:
         config.write(configfile)
 
 def read_config():
     config = configparser.ConfigParser()
-    config.read(AoHLauncher.aoh_config_file)
+    config.read(GameLauncher.aoh_config_file)
     return config
 
 def update_config(section, key, new_value):
@@ -27,7 +27,7 @@ def update_config(section, key, new_value):
     
     config[section][key] = new_value
         
-    with open(AoHLauncher.aoh_config_file, 'w') as configfile:
+    with open(GameLauncher.aoh_config_file, 'w') as configfile:
         config.write(configfile)
 
 '''
