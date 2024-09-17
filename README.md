@@ -1,6 +1,6 @@
-# Aspiration of Holowave Minecraft Launcher Based on Python
+# Aspiration of Holowave Minecraft Launcher
 
-![Launcher logo](https://imgur.com/o8C1jAz)
+![Launcher logo](https://imgur.com/o8C1jAz.png)
 
 This project is dedicated to creating a Minecraft launcher based on Python. Our team consists of three independent developers who are creating their own modifications and Minecraft launcher. This is a FREE open-source project. Our main goal is to improve the gameplay of vanilla Minecraft! As junior level developers, we will be glad to receive any of your comments and advice.
 
@@ -10,7 +10,7 @@ This project is dedicated to creating a Minecraft launcher based on Python. Our 
 - Easy to download and start to play with mods
 - New experiance with uniqe mods
 
-## Installation
+## Build
 
 To use our launcher, you need to download and install the following libraries:
 
@@ -26,7 +26,7 @@ To use the launcher, simply launch the application and enter your Minecraft user
 ## Credits / Our Team
 
 - **[Scavenger (Evaringos)](https://github.com/Evaringos)** - **CEO** of project
-- **[Stradlater25](hhttps://github.com/Stradlater25)** - Core **programmer**
+- **[Stradlater25](https://github.com/Stradlater25)** - Core **programmer**
 - **[Xeenor](https://github.com/Xeenomiya)** - **Designer** / Community manager
 
 ## Roadmap
