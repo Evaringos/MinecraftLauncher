@@ -14,7 +14,7 @@ is_game_installed = False
 base_version = "1.20.1"
 
 # Путь установки игры, модов, конфигов
-minecraft_path = os.path.expanduser('~/AppData/Roaming/.AoHLauncher')
+minecraft_path = os.path.expanduser('~\\AppData\\Roaming\\.AoHLauncher')
 aoh_config_file = os.path.join(minecraft_path, "AoHConfig.ini")
 # Переменная для хранения версии Forge
 forge_version_name = None
@@ -71,9 +71,11 @@ def cloudDownload (): # ЭТА КЭЭМЕЛ КЕЙС
                 'webdav_password' : secret.davpass,
                 'disable_check': True } #иначе ломается
     client = Client(options)
+    client.download_file(remote_path="minecraft/options.txt", local_path=minecraft_path)
     client.download("minecraft/config", os.path.join(minecraft_path, "config"))
     client.download("minecraft/mods", os.path.join(minecraft_path, "mods"))
-
+    # client.download_file("minecraft/options.txt", minecraft_path)
+    
     
 # Функция для завершения установки
 def on_installation_complete():
