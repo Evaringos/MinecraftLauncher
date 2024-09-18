@@ -33,7 +33,7 @@ def check_game_installed():
 
 # Есть ли файл конфигурации
 def check_configfile():
-    if not os.path.isfile(aoh_config_file): create_default_config()
+    if os.path.isfile(aoh_config_file): create_default_config()
 
 # Функция для установки игры
 def install_game():
