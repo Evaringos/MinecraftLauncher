@@ -20,7 +20,7 @@ class ThemeNew(QtWidgets.QMainWindow):
         self.setStyleSheet("""
         QMainWindow {
             background: qlineargradient(x1:0, y1:0, x0:1, y2:1, 
-            stop:0 #411069, stop:1 #200338);
+            stop:0 #2f0552, stop:1 #200338);
         }
         QMenu { /*Dropdown menu*/
             background-color: #330d52;
@@ -30,12 +30,12 @@ class ThemeNew(QtWidgets.QMainWindow):
         QToolBar {
             border: none;
             background: qlineargradient(x1:0, y1:0, x2:1, y2:1, 
-            stop:0 #411069, stop:1 #7d1dcc);
+            stop:0 #2f0552, stop:1 #7d1dcc);
         }
         QLineEdit { /* Username input area */
             border-radius: 5px;
             border: 1px solid #7d1dcc;
-            background-color: #61199c;
+            background-color: #3a0d5e;
             padding: 2px;
             font-family: 'Consolas', monospace;
             /* font-size: 14px; */
@@ -44,16 +44,16 @@ class ThemeNew(QtWidgets.QMainWindow):
         QListView { /* Console box*/
             border-radius: 5px;
             border: 1px solid #7d1dcc;
-            background-color: #61199c;
+            background-color: #3a0d5e;
             background: qlineargradient(x1:0, y1:0, x2:1, y2:1, 
-            stop:0 #511582, stop:1 #61199c);                           
+            stop:0 #2b0847, stop:1 #3a0d5e);                           
             color: #b17dff;
         }
         QPushButton {
             border-radius: 5px;
             border: 2px solid #7d1dcc;
             background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0 #61199c, stop: 1 #601fc2);
+            stop: 0 #2b0847, stop: 1 #3a0d5e);
             padding: 2px;
             font-family: 'Consolas', monospace;
             font-size: 18px;
@@ -67,7 +67,7 @@ class ThemeNew(QtWidgets.QMainWindow):
         }
         QPushButton:pressed {
             background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                stop: 0 #61199c, stop: 1 #411069);
+                stop: 0 #61199c, stop: 1 #2f0552);
             border: 1px solid #61199c;
         }
         QProgressBar {
