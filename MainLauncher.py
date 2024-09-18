@@ -2,30 +2,13 @@ import sys
 import os
 import GameLauncher
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import QActionEvent, QIcon, QDesktopServices, QPainter
+from PyQt5.QtGui import QColor, QIcon, QDesktopServices, QPainter, QPixmap
 from PyQt5.QtCore import QUrl, QSize
-from PyQt5.QtSvg import QSvgWidget
+from PyQt5.QtSvg import QSvgRenderer
 from ConfigHandler import update_config, read_config, create_default_config
-from Themes import Theme
+from Themes import ThemeNew
 
 config = read_config()
-
-# Класс для отображение векторных иконок
-class ColoredSvgWidget (QSvgWidget):
-    def __init__(self, filepath, color, size, parent=None):
-        super().__init__(parent)
-        self.load(filepath)
-        self.setFixedSize(size)
-        self.color = color
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
-
-        self.renderer().render(painter)
-
-        painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
-        painter.fillRect(self.rect(), self.color)
 
 class DraggableStretchWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -56,10 +39,11 @@ class Ui_MainWindow(object):
         self.settings = QtCore.QSettings("AoH Launcher", "Settings")
         
     def update_theme(self, theme=None):
-        CurTheme = Theme()  # AoHClassic по дефолту
+        # AoHClassic по дефолту
         if theme :
-            CurTheme.SetTheme(theme)
-        MainWindow.setStyleSheet(f"background-color: {CurTheme.ColBg}; color: {CurTheme.ColAccent};")
+            ThemeNew.SetTheme(MainWindow,theme)
+            update_config("Launcher", "Theme", theme)
+        else: ThemeNew.SetTheme(MainWindow,config["Launcher"]["theme"])
 
 
     def launch_game_pressed(self):
@@ -76,7 +60,7 @@ class Ui_MainWindow(object):
         app_icon = QtGui.QIcon(icon_path)
         app.setWindowIcon(app_icon)
         self.update_theme()
-        MainWindow.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint)
+        MainWindow.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint) # отключение рамки окна
 
         MainWindow.setObjectName("MainWindow")
         MainWindow.setWindowTitle("AoH Launcher")
@@ -97,13 +81,6 @@ class Ui_MainWindow(object):
         self.toolbar.setMovable(False)
         self.toolbar.setFixedHeight(32)
         self.toolbar.setContextMenuPolicy(QtCore.Qt.PreventContextMenu) # Отключение встроенной функции удаления тулбара
-        self.toolbar.setStyleSheet("""
-            QToolBar {
-                border: none;
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, 
-                stop:0 #333333, stop:1 #000000);
-            }
-        """)
 
         # Иконки для кнопок
         icon_paths = {
@@ -123,12 +100,20 @@ class Ui_MainWindow(object):
         self.SettingsButton.setFixedSize(32, 32)
         self.SettingsButton.setIcon(QIcon(icon_paths["settings"]))
         self.toolbar.addWidget(self.SettingsButton)
-        
 
+        # Создаем ColoredIconEngine
+        
         # Создаем выпадающее меню (dropdown menu)
         self.settings_menu = QtWidgets.QMenu(MainWindow)
         self.theme_menu = QtWidgets.QMenu("Themes settings", self.settings_menu)
         self.theme_menu.setIcon(QIcon(icon_paths["brush"]))
+        # tmp_icon = ColoredSvgWidget(icon_paths["brush"], QColor("#ff0000"), QSize(32,32))
+        # tmp_layout = QtWidgets.QVBoxLayout()
+        # self.tmp_layout.addWidget(tmp_icon)
+        # self.theme_menu.setIcon(tmp_layout)
+        
+
+        
         self.language_menu = QtWidgets.QMenu("Language settings", self.settings_menu)
         self.language_menu.setIcon(QIcon(icon_paths["globe"]))
 
@@ -139,17 +124,14 @@ class Ui_MainWindow(object):
         # Создаем действия для меню
         self.theme_option1 = self.theme_menu_group.addAction("AoH Classic")
         self.theme_option2 = self.theme_menu_group.addAction("Console92")
-        self.theme_option1.setChecked(True)
 
         self.theme_menu.addAction(self.theme_option1)
         self.theme_menu.addAction(self.theme_option2)        
     
         self.theme_option1.setCheckable(True)
-        self.theme_option1.setChecked(True) #Галочка по дефолту
         self.theme_option2.setCheckable(True)
-
-
-
+        if config["Launcher"]["Theme"] == "AoHClassic": self.theme_option1.setChecked(True) #Галочка по дефолту
+        else: self.theme_option2.setChecked(True)
 
         
         self.language_option1 = self.language_menu.addAction("English")
@@ -174,11 +156,13 @@ class Ui_MainWindow(object):
         self.settings_menu.addAction("Credits")
         
         self.SettingsButton.setMenu(self.settings_menu) # Привязываем меню к кнопке
+        self.SettingsButton.setToolTip("Settings")
 
         # Папка с игрой
         self.FolderWithGame = QtWidgets.QPushButton()
         self.FolderWithGame.setFixedSize(32, 32)
         self.FolderWithGame.setIcon(QIcon(icon_paths["folder"]))
+        self.FolderWithGame.setToolTip("Open game folder")
         self.toolbar.addWidget(self.FolderWithGame)
         # Метод для открытия папки
         def open_folder():
@@ -188,27 +172,30 @@ class Ui_MainWindow(object):
 
         # Обновление модов (возможно временная функция)
         self.Refresh = QtWidgets.QPushButton()
+        self.Refresh.setToolTip("Reinstall mods")
         self.Refresh.setFixedSize(32, 32)
         self.Refresh.setIcon(QIcon(icon_paths["refresh"]))
         self.toolbar.addWidget(self.Refresh)
 
         # def refresh_mods():
-
-        # self.Refresh.clicked.connect(refresh_mods)
+        self.Refresh.clicked.connect(GameLauncher.cloudDownload)
 
         # Stretch
         stretch_widget = DraggableStretchWidget()
         self.toolbar.addWidget(stretch_widget)
+        
         # Hide window button
         self.HideWindow = QtWidgets.QPushButton()
         self.HideWindow.setFixedSize(32, 32)
         self.HideWindow.setIcon(QIcon(icon_paths["hide"]))
+        self.HideWindow.setToolTip("Hide")
         self.HideWindow.clicked.connect(MainWindow.showMinimized)
         self.toolbar.addWidget(self.HideWindow)
         # Close window button
         self.CloseWindow = QtWidgets.QPushButton()
         self.CloseWindow.setFixedSize(32, 32)
         self.CloseWindow.setIcon(QIcon(icon_paths["close"]))
+        self.CloseWindow.setToolTip("Close")        
         self.CloseWindow.clicked.connect(self.save_username_and_exit)
         self.toolbar.addWidget(self.CloseWindow)
 
@@ -236,7 +223,7 @@ class Ui_MainWindow(object):
         self.Console.setMinimumSize(QtCore.QSize(0, 210))
         self.Console.setObjectName("Console")
         self.verticalLayout.addWidget(self.Console)
-        self.Console.setStyleSheet("border-radius: 5px; border: 1px solid rgb(8, 8, 8); background-color: #1C1C1C;")
+
         # Модель данных для QListView
         self.model = QtCore.QStringListModel()  # Исправлено: QStringListModel находится в QtCore
         self.Console.setModel(self.model)
@@ -285,20 +272,7 @@ class Ui_MainWindow(object):
         self.Username.setClearButtonEnabled(False)
         self.Username.setText(config["Launcher"]["Username"])
         self.verticalLayout.addWidget(self.Username)        
-#        self.Username.textChanged.connect(self.save_username)
-        # self.Username.setStyleSheet("border-radius: 5px; border: 1px solid rgb(51, 51, 51); background-color: #CCCCCC; padding: 2px; color: #000000;")
-        self.Username.setStyleSheet("""
-            QLineEdit {
-                border-radius: 5px;
-                border: 1px solid rgb(8, 8, 8);
-                background-color: #1C1C1C;
-                padding: 2px;
-                font-family: 'Consolas', monospace;
-                /* font-size: 14px; */
-                color: #f2b036;
-            }
-        """)
-        
+
         # Spacer
         spacerItem2 = QtWidgets.QSpacerItem(20, 50, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.verticalLayout.addItem(spacerItem2)
@@ -317,29 +291,6 @@ class Ui_MainWindow(object):
         self.PlayButton.clicked.connect(self.launch_game_pressed)  
         self.verticalLayout.addWidget(self.PlayButton)
         # self.PlayButton.setStyleSheet("font-family: 'Consolas', monospace; font-size: 18px;")
-        self.PlayButton.setStyleSheet("""
-            QPushButton {
-                border-radius: 5px;
-                border: 1px solid rgb(8, 8, 8);
-        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0 #1C1C1C, stop: 1 #151515);
-                padding: 2px;
-                font-family: 'Consolas', monospace;
-                font-size: 18px;
-                font-weight: bold;
-                color: #f2b036;
-            }
-            QPushButton:hover {
-                background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0 #2B2B2B, stop: 1 #333333);
-                border: 1px solid rgb(50, 50, 50);
-            }
-            QPushButton:pressed {
-                background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0 #333333, stop: 1 #2B2B2B);
-                border: 1px solid rgb(100, 100, 100);
-            }
-        """)
 
         # Progress bar устаноки игры
         self.progressBar = QtWidgets.QProgressBar(self.centralwidget)
@@ -358,17 +309,7 @@ class Ui_MainWindow(object):
         self.progressBar.setObjectName("progressBar")
         self.verticalLayout.addWidget(self.progressBar)
         self.horizontalLayout.addLayout(self.verticalLayout)
-        self.progressBar.setStyleSheet("""
-            QProgressBar {
-                border: 1px solid rgb(8, 8, 8);
-                border-radius: 5px;
-                background-color: rgb(50, 50, 50);
-            }
-            QProgressBar::chunk {
-                background-color: #f2b036;
-                border-radius: 5px;
-            }
-        """)
+
 
         MainWindow.setCentralWidget(self.centralwidget)
 
@@ -385,6 +326,7 @@ class Ui_MainWindow(object):
 
 if __name__ == "__main__":
     import sys
+    
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()

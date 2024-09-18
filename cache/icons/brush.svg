@@ -2,7 +2,7 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="-10 0 2058 2048">
   <g transform="matrix(1 0 0 -1 0 1638)">
-   <path fill="currentColor"
+   <path fill="#f2b036"
 d="M906 1614l82 -207q10 -24 36 -24t36 24l82 207q10 24 36 24h422q80 0 136 -56t56 -136v-704v-90v-38h-38h-1460h-38v38v90v704q0 80 56 136t136 56h38q26 0 36 -24l82 -207q10 -24 36 -24t36 24l82 207q10 24 36 24h76q26 0 36 -24zM256 486h1536v-128q0 -106 -75 -181
 t-181 -75h-256v-256q0 -106 -75 -181t-181 -75t-181 75t-75 181v256h-256q-106 0 -181 75t-75 181v128zM1024 -90q-26 0 -45 -19t-19 -45t19 -45t45 -19t45 19t19 45t-19 45t-45 19z" />
   </g>

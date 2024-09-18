@@ -4,7 +4,8 @@ import GameLauncher
 def create_default_config():
     config = configparser.ConfigParser()
     config['Launcher'] = {
-        'username': ''
+        'username': '',
+        'theme': 'Classic92'
     }
     with open(GameLauncher.aoh_config_file, 'w') as configfile:
         config.write(configfile)
