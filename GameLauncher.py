@@ -23,7 +23,6 @@ forge_version_name = None
 def check_game_installed():
     global is_game_installed, forge_version_name
     if os.path.exists(minecraft_path):
-        print("Игра уже установлена")
         is_game_installed = True
         # Проверяем, установлена ли версия Forge
         versions = minecraft_launcher_lib.utils.get_installed_versions(minecraft_path)
@@ -34,7 +33,7 @@ def check_game_installed():
 
 # Есть ли файл конфигурации
 def check_configfile():
-    if not os.path.isfile(aoh_config_file): create_default_config()
+    if os.path.isfile(aoh_config_file): create_default_config()
 
 # Функция для установки игры
 def install_game():
@@ -102,4 +101,3 @@ print(f"Путь установки: {minecraft_path}")
 # Проверяем, установлена ли игра при запуске лаунчера
 check_game_installed()
 check_configfile()
-

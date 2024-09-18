@@ -114,6 +114,9 @@ class Ui_MainWindow(object):
         self.language_menu = QtWidgets.QMenu("Language settings", self.settings_menu)
         self.language_menu.setIcon(QIcon(icon_paths["globe"]))
 
+        self.Credits = QtWidgets.QAction("Credits", self.settings_menu)
+        self.Credits.setIcon(QIcon(icon_paths["info"]))
+
         # Создаём группу действий для темы
         self.theme_menu_group = QtWidgets.QActionGroup(MainWindow)
         self.theme_menu_group.setExclusive(True)
@@ -124,7 +127,7 @@ class Ui_MainWindow(object):
 
         self.theme_menu.addAction(self.theme_option1)
         self.theme_menu.addAction(self.theme_option2)        
-    
+
         self.theme_option1.setCheckable(True)
         self.theme_option2.setCheckable(True)
         if config["Launcher"]["Theme"] == "AoHClassic": self.theme_option1.setChecked(True) #Галочка по дефолту
@@ -143,14 +146,19 @@ class Ui_MainWindow(object):
         self.theme_option2.triggered.connect(lambda: self.update_theme("Classic92"))
         self.language_option1.toggled.connect(lambda: self.on_theme_option_toggled(self.language_option1))
         self.language_option2.toggled.connect(lambda: self.on_theme_option_toggled(self.language_option2))
-
-
-
+        self.Credits.triggered.connect(lambda: ShowCredits())
         
         # Добавляем вложенное меню в основное меню
         self.settings_menu.addMenu(self.theme_menu)
         self.settings_menu.addMenu(self.language_menu)
-        self.settings_menu.addAction("Credits")
+        self.settings_menu.addAction(self.Credits)
+
+        def ShowCredits():
+            self.add_message_to_console("""---================---
+CEO of project - Scavenger (Evaringos)
+Core programmer - Stradlater25
+Designer / Community manager - Xeenomiya
+---================---""")
         
         self.SettingsButton.setMenu(self.settings_menu) # Привязываем меню к кнопке
         self.SettingsButton.setToolTip("Settings")

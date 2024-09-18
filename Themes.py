@@ -12,7 +12,10 @@ from PyQt5 import QtWidgets
 class ThemeNew(QtWidgets.QMainWindow):
     def __init__(self):
         super(ThemeNew,self).self.__init__()
-
+        self.timer = QtCore.QTimer(self)
+        self.timer.timeout.connect(self.update_particles)
+        self.timer.start(50)  # Set the timer to fire every 50ms
+        
     def SetTheme(self, theme):
         if theme == "Classic92": ThemeNew.Classic92(self)
         elif theme == "AoHClassic": ThemeNew.AoHClassic(self)
@@ -20,65 +23,72 @@ class ThemeNew(QtWidgets.QMainWindow):
     def AoHClassic(self):
         self.setStyleSheet("""
         QMainWindow {
-            background-color: #f1f1f1;
+            background: qlineargradient(x1:0, y1:0, x0:1, y2:1, 
+            stop:0 #2f0552, stop:1 #200338);
         }
         QMenu { /*Dropdown menu*/
-            background-color: #f1f1f1;
-            color: #f2b036;
+            background-color: #330d52;
+            border: 1px solid #7d1dcc;                           
+            color: #b17dff;
+        }
+        QMenu:hover { /*Dropdown menu*/              
+            color: #601fc2;
         }
         QToolBar {
             border: none;
             background: qlineargradient(x1:0, y1:0, x2:1, y2:1, 
-            stop:0 #d0d0d0, stop:1 #ffffff);
+            stop:0 #2f0552, stop:1 #7d1dcc);
         }
         QLineEdit { /* Username input area */
             border-radius: 5px;
-            border: 1px solid #ffffff;
-            background-color: #f1f1f1;
+            border: 1px solid #7d1dcc;
+            background-color: #3a0d5e;
             padding: 2px;
             font-family: 'Consolas', monospace;
             /* font-size: 14px; */
-            color: #f2b036;
+            color: #b17dff;
         }
         QListView { /* Console box*/
             border-radius: 5px;
-            border: 1px solid #ffffff;
-            background-color: #f1f1f1;
-            color: #f2b036;
+            border: 1px solid #7d1dcc;
+            background-color: #3a0d5e;
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:1, 
+            stop:0 #2b0847, stop:1 #3a0d5e);                           
+            color: #b17dff;
         }
         QPushButton {
             border-radius: 5px;
-            border: 1px solid #ffffff;
+            border: 2px solid #7d1dcc;
             background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0 #f1f1f1, stop: 1 #e9e9e9);
+            stop: 0 #2b0847, stop: 1 #3a0d5e);
             padding: 2px;
             font-family: 'Consolas', monospace;
             font-size: 18px;
             font-weight: bold;
-            color: #f2b036;
+            color: #b17dff;
         }
         QPushButton:hover {
             background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                stop: 0 #f1f1f1, stop: 1 #e0e0e0);
-            border: 1px solid #f1f1f1;
+                stop: 0 #61199c, stop: 1 #601fc2);
+            border: 1px solid #61199c;
         }
         QPushButton:pressed {
             background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                stop: 0 #f1f1f1, stop: 1 #e9e9e9);
-            border: 1px solid #e9e9e9;
+                stop: 0 #61199c, stop: 1 #2f0552);
+            border: 1px solid #61199c;
         }
         QProgressBar {
-            border: 1px solid #ffffff;
+            border: 1px solid #7d1dcc;
             border-radius: 5px;
-            background-color: #e9e9e9;
+            background-color: #601fc2;
         }
         QProgressBar::chunk {
-            background-color: #f2b036;
+            background-color: #b17dff;
             border-radius: 5px;
         }
         QToolTip {
-            background-color : #f1f1f1;
-            color: #f2b036;
+            background-color : #601fc2;
+            color: #b17dff;
             border: none;
         }
         QLabel#image_label {
@@ -90,10 +100,11 @@ class ThemeNew(QtWidgets.QMainWindow):
     def Classic92(self):
         self.setStyleSheet("""
         QMainWindow {
-            background-color: #191919;
+            background-color: #191919;                      
         }
         QMenu { /*Dropdown menu*/
             background-color: #191919;
+            border: 1px solid #f2b036;                           
             color: #f2b036;
         }
         QToolBar {
