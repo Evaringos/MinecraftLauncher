@@ -5,4 +5,4 @@ pyinstaller --noconfirm --noconsole --onefile ^
 	--icon=cache/aoh_icon.ico ^
 	--add-data="cache/aoh_icon.ico;cache" ^
 	--add-data="cache/Launcher_logo.png;cache" ^
-	TestLauncherDesign.py
+	MainLauncher.py
