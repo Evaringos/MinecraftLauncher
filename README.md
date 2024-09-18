@@ -33,6 +33,7 @@ To use the launcher, simply launch the application and enter your Minecraft user
 
 We estimate that we have completed less than 40% of the work required for this project. Below is a list of tasks that we plan to complete in the future:
 
+- Verification system
 - Add more themes
 - Improve console output
 - Enhance launcher icons

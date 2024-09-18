@@ -7,6 +7,7 @@ from PyQt5.QtCore import QUrl, QSize
 from PyQt5.QtSvg import QSvgRenderer
 from ConfigHandler import update_config, read_config, create_default_config
 from Themes import ThemeNew
+from GameFolderDestroyer import MinecraftDestroyer
 
 config = read_config()
 
@@ -51,13 +52,26 @@ class Ui_MainWindow(object):
 
 
     def launch_game_pressed(self):
-        MainWindow.hide()
-        GameLauncher.launch_game(self.Username.text())
-        MainWindow.show()
+        if os.path.exists(GameLauncher.folder_version):
+            MainWindow.hide()
+            GameLauncher.launch_game(self.Username.text())
+            MainWindow.show()
+        else:
+            GameLauncher.install_game()
+            # GameLauncher.cloudDownload()
+            if GameLauncher.DownloadCompleted == True:
+                self.ButtonTextChange()
+                
 
     def save_username_and_exit(self):
         update_config("Launcher", "Username", self.Username.text())
         MainWindow.close()
+
+    def ButtonTextChange(self): # Не знаю куда ещё подцепить эту функцию :/
+        if os.path.exists(GameLauncher.folder_version):
+            self.PlayButton.setText("Play")
+        else:
+            self.PlayButton.setText("Install game")
 
     def setupUi(self, MainWindow):
         icon_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'cache', 'aoh_icon.ico'))
@@ -95,7 +109,8 @@ class Ui_MainWindow(object):
             "refresh": os.path.join('cache', 'icons', 'reload.svg'),
             "globe": os.path.join('cache', 'icons', 'globe.svg'),
             "brush": os.path.join('cache', 'icons', 'brush.svg'),
-            "info": os.path.join('cache', 'icons', 'info.svg')
+            "info": os.path.join('cache', 'icons', 'info.svg'),
+            "bin": os.path.join('cache', 'icons', 'bin.svg')
         }
         game_folder_path = os.path.join(os.getenv('APPDATA'), '.AoHLauncher')
 
@@ -116,6 +131,9 @@ class Ui_MainWindow(object):
 
         self.Credits = QtWidgets.QAction("Credits", self.settings_menu)
         self.Credits.setIcon(QIcon(icon_paths["info"]))
+
+        self.Delete = QtWidgets.QAction("Delete Minecraft", self.settings_menu)
+        self.Delete.setIcon(QIcon(icon_paths["bin"]))
 
         # Создаём группу действий для темы
         self.theme_menu_group = QtWidgets.QActionGroup(MainWindow)
@@ -147,11 +165,13 @@ class Ui_MainWindow(object):
         self.language_option1.toggled.connect(lambda: self.on_theme_option_toggled(self.language_option1))
         self.language_option2.toggled.connect(lambda: self.on_theme_option_toggled(self.language_option2))
         self.Credits.triggered.connect(lambda: ShowCredits())
+        self.Delete.triggered.connect(lambda: DeleteMinecraft())
         
         # Добавляем вложенное меню в основное меню
         self.settings_menu.addMenu(self.theme_menu)
         self.settings_menu.addMenu(self.language_menu)
         self.settings_menu.addAction(self.Credits)
+        self.settings_menu.addAction(self.Delete)
 
         def ShowCredits():
             self.add_message_to_console("""---================---
@@ -159,6 +179,10 @@ CEO of project - Scavenger (Evaringos)
 Core programmer - Stradlater25
 Designer / Community manager - Xeenomiya
 ---================---""")
+        
+        def DeleteMinecraft():
+            MinecraftDestroyer.DestroyIt()
+            self.ButtonTextChange()
         
         self.SettingsButton.setMenu(self.settings_menu) # Привязываем меню к кнопке
         self.SettingsButton.setToolTip("Settings")
@@ -171,7 +195,10 @@ Designer / Community manager - Xeenomiya
         self.toolbar.addWidget(self.FolderWithGame)
         # Метод для открытия папки
         def open_folder():
-            QDesktopServices.openUrl(QUrl.fromLocalFile(game_folder_path))
+            if os.path.exists(GameLauncher.minecraft_path):
+                QDesktopServices.openUrl(QUrl.fromLocalFile(game_folder_path))
+            else:
+                self.add_message_to_console("The game is not installed yet")
         # Подключение метода к нажатию кнопки
         self.FolderWithGame.clicked.connect(open_folder)
 
@@ -264,7 +291,7 @@ Designer / Community manager - Xeenomiya
         self.PlayButton = QtWidgets.QPushButton(self.centralwidget)
         self.PlayButton.setMinimumSize(QtCore.QSize(150, 40))
         self.PlayButton.setObjectName("PlayButton")
-        self.PlayButton.setText("Play")
+        self.ButtonTextChange()
         font = QtGui.QFont()
         font.setFamily('Consolas')
         font.setPointSize(18)
