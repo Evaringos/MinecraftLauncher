@@ -9,3 +9,4 @@
 *.spec
 secret.py
 AoHLauncher.exe
+.venv
