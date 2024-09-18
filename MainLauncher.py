@@ -242,20 +242,13 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.Console)
         self.Console.setStyleSheet("border-radius: 5px; border: 1px solid rgb(8, 8, 8); background-color: #1C1C1C;")
         # Модель данных для QListView
-        self.model = NoClickModel()
+        self.model = QtGui.QStandardItemModel()
         self.Console.setModel(self.model)
-        self.Console.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-        self.add_message_to_console("Launcher has started")
-
-    def add_message_to_console(self, message):
-        current_list = self.model.stringList()
-        current_list.append(message)
-        self.model.setStringList(current_list)
-        self.Console.scrollToBottom()
-        font = QtGui.QFont()
-        font.setFamily("Consolas")
-        font.setPointSize(11)
-        self.Console.setFont(font)
+        # Отключение обводки строк
+        self.Console.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)  # Для выбора строк
+        self.Console.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)  # Отключаем выбор
+        # Стартовое сообщение
+        self.add_message_to_console("Launcher started")
 
         # Spacer
         spacerItem1 = QtWidgets.QSpacerItem(100, 50, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
@@ -377,6 +370,19 @@ class Ui_MainWindow(object):
         # self.patchButton.setText(_translate("MainWindow", "patchButton"))
         # self.FolderWithGame.setText(_translate("MainWindow", "folderButton"))
         # self.PlayButton.setText(_translate("MainWindow", "Play"))
+
+    def add_message_to_console(self, message):
+        # Создаем новый элемент списка с заданным стилем
+        item = QtGui.QStandardItem(message)
+        item.setFont(QtGui.QFont("Consolas", 11))
+        item.setForeground(QtGui.QBrush(QtGui.QColor("orange")))
+        
+        # Устанавливаем флаги, чтобы элемент не был редактируемым и не нажимаемым
+        item.setFlags(QtCore.Qt.ItemIsSelectable)  # Только выбор, без редактирования
+        
+        # Добавляем элемент в модель
+        self.model.appendRow(item)
+        self.Console.scrollToBottom()
 
 if __name__ == "__main__":
     import sys
