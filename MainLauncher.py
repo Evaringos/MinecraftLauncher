@@ -220,13 +220,15 @@ Designer / Community manager - Xeenomiya
         self.Console.setMinimumSize(QtCore.QSize(0, 210))
         self.Console.setObjectName("Console")
         self.verticalLayout.addWidget(self.Console)
-
         # Модель данных для QListView
         self.model = QtGui.QStandardItemModel()
         self.Console.setModel(self.model)
         # Отключение обводки строк
         self.Console.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)  # Для выбора строк
         self.Console.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)  # Отключаем выбор
+        # Пролистывание вниз при добавлении нового элемента в консоль
+        scrollBar = self.Console.verticalScrollBar()
+        scrollBar.setValue(scrollBar.maximum())
         # Стартовое сообщение
         self.add_message_to_console("Launcher started")
 

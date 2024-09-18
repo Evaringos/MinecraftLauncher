@@ -1,5 +1,8 @@
+import os
 import configparser
-import GameLauncher
+
+minecraft_path = os.path.expanduser('~\\AppData\\Roaming\\.AoHLauncher')
+aoh_config_file = os.path.join(minecraft_path, "AoHConfig.ini")
 
 def create_default_config():
     config = configparser.ConfigParser()
@@ -7,12 +10,12 @@ def create_default_config():
         'username': '',
         'theme': 'Classic92'
     }
-    with open(GameLauncher.aoh_config_file, 'w') as configfile:
+    with open(aoh_config_file, 'w') as configfile:
         config.write(configfile)
 
 def read_config():
     config = configparser.ConfigParser()
-    config.read(GameLauncher.aoh_config_file)
+    config.read(aoh_config_file)
     return config
 
 def update_config(section, key, new_value):
@@ -28,7 +31,7 @@ def update_config(section, key, new_value):
     
     config[section][key] = new_value
         
-    with open(GameLauncher.aoh_config_file, 'w') as configfile:
+    with open(aoh_config_file, 'w') as configfile:
         config.write(configfile)
 
 '''
