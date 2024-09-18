@@ -105,18 +105,11 @@ class Ui_MainWindow(object):
         self.SettingsButton.setIcon(QIcon(icon_paths["settings"]))
         self.toolbar.addWidget(self.SettingsButton)
 
-        # Создаем ColoredIconEngine
         
         # Создаем выпадающее меню (dropdown menu)
         self.settings_menu = QtWidgets.QMenu(MainWindow)
         self.theme_menu = QtWidgets.QMenu("Themes settings", self.settings_menu)
         self.theme_menu.setIcon(QIcon(icon_paths["brush"]))
-        # tmp_icon = ColoredSvgWidget(icon_paths["brush"], QColor("#ff0000"), QSize(32,32))
-        # tmp_layout = QtWidgets.QVBoxLayout()
-        # self.tmp_layout.addWidget(tmp_icon)
-        # self.theme_menu.setIcon(tmp_layout)
-        
-
         
         self.language_menu = QtWidgets.QMenu("Language settings", self.settings_menu)
         self.language_menu.setIcon(QIcon(icon_paths["globe"]))
@@ -204,18 +197,10 @@ class Ui_MainWindow(object):
         self.toolbar.addWidget(self.CloseWindow)
 
         # Launcher logo
-        Launcher_logo = os.path.join(os.path.dirname(__file__), 'cache', 'Launcher_logo.png')
+        # Launcher_logo = os.path.join(os.path.dirname(__file__), 'cache', 'Launcher_logo.png')
         self.image_label = QtWidgets.QLabel(self.centralwidget)
         self.image_label.setObjectName("image_label")
-        self.image_label.setPixmap(QtGui.QPixmap(Launcher_logo))
-        self.image_label.setScaledContents(True)  # Включаем масштабирование
-        self.image_label.resize(100, 100)  # Устанавливаем размеры
-        self.image_label.setAlignment(QtCore.Qt.AlignCenter)  # Выравниваем картинку по центру
         self.verticalLayout.addWidget(self.image_label)
-
-        # Spacer
-        #spacerItem = QtWidgets.QSpacerItem(20, 50, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        #self.verticalLayout.addItem(spacerItem)
 
         # Консоль для более отзывчивого интерфейса
         self.Console = QtWidgets.QListView(self.centralwidget)
@@ -271,14 +256,12 @@ class Ui_MainWindow(object):
         self.PlayButton.setObjectName("PlayButton")
         self.PlayButton.setText("Play")
         font = QtGui.QFont()
-        font = QtGui.QFont()
         font.setFamily('Consolas')
         font.setPointSize(18)
         font.setWeight(QtGui.QFont.Bold)  # или font.setWeight(75) для более тонкого шрифта
         self.PlayButton.setFont(font)
         self.PlayButton.clicked.connect(self.launch_game_pressed)  
         self.verticalLayout.addWidget(self.PlayButton)
-        # self.PlayButton.setStyleSheet("font-family: 'Consolas', monospace; font-size: 18px;")
 
         # Progress bar устаноки игры
         self.progressBar = QtWidgets.QProgressBar(self.centralwidget)
@@ -334,7 +317,3 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
-
-
-        # self.centralwidget.setStyleSheet("border-radius: 10px;")
-        # app.setStyleSheet("border-radius: 10px;")

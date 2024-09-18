@@ -80,7 +80,11 @@ class ThemeNew(QtWidgets.QMainWindow):
             background-color : #f1f1f1;
             color: #f2b036;
             border: none;
-        }        
+        }
+        QLabel#image_label {
+            qproperty-pixmap: url("cache/Launcher_logo_dark.png");
+            qproperty-scaledContents: true;
+        }
         """)
         
     def Classic92(self):
@@ -147,6 +151,10 @@ class ThemeNew(QtWidgets.QMainWindow):
             background-color : #1c1c1c;
             color: #f2b036;
             border: none;
+        }
+        QLabel#image_label {
+            qproperty-pixmap: url("cache/Launcher_logo.png");
+            qproperty-scaledContents: true;
         }
         """)
         
