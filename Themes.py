@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore # Добавил QtCore
 
 # AoHClassic
 # ColAccent = "#f2b036"
@@ -95,12 +95,16 @@ class ThemeNew(QtWidgets.QMainWindow):
             qproperty-pixmap: url("cache/Launcher_logo_dark.png");
             qproperty-scaledContents: true;
         }
+        QMenu::item:selected {
+            background-color: #401463;
+        }
         """)
         
     def Classic92(self):
         self.setStyleSheet("""
         QMainWindow {
-            background-color: #191919;                      
+            background-color: #191919;
+            border: 1px solid #000000;  /*Новая обводка, не знаю как ее сделать чуть ниже сверху и стоит ли сделать оранжевой?*/              
         }
         QMenu { /*Dropdown menu*/
             background-color: #191919;
@@ -167,11 +171,7 @@ class ThemeNew(QtWidgets.QMainWindow):
             qproperty-pixmap: url("cache/Launcher_logo.png");
             qproperty-scaledContents: true;
         }
+        QMenu::item:selected {
+            background-color: #292828;
+        }
         """)
-        
-
-
-    
-    
-
-
