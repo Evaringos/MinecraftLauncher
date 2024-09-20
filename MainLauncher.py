@@ -174,7 +174,7 @@ class Ui_MainWindow(object):
         self.settings_menu.addAction(self.Delete)
 
         def ShowCredits():
-            self.add_message_to_console("""---================---
+            self.Console.addItem("""---================---
 CEO of project - Scavenger (Evaringos)
 Core programmer - Stradlater25
 Designer / Community manager - Xeenomiya
@@ -198,7 +198,7 @@ Designer / Community manager - Xeenomiya
             if os.path.exists(GameLauncher.minecraft_path):
                 QDesktopServices.openUrl(QUrl.fromLocalFile(game_folder_path))
             else:
-                self.add_message_to_console("The game is not installed yet")
+                self.Console.addItem("The game is not installed yet")
         # Подключение метода к нажатию кнопки
         self.FolderWithGame.clicked.connect(open_folder)
 
@@ -238,7 +238,7 @@ Designer / Community manager - Xeenomiya
         self.verticalLayout.addWidget(self.image_label)
 
         # Консоль для более отзывчивого интерфейса
-        self.Console = QtWidgets.QListView(self.centralwidget)
+        self.Console = QtWidgets.QListWidget(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -247,17 +247,10 @@ Designer / Community manager - Xeenomiya
         self.Console.setMinimumSize(QtCore.QSize(0, 210))
         self.Console.setObjectName("Console")
         self.verticalLayout.addWidget(self.Console)
-        # Модель данных для QListView
-        self.model = QtGui.QStandardItemModel()
-        self.Console.setModel(self.model)
-        # Отключение обводки строк
-        self.Console.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)  # Для выбора строк
-        self.Console.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)  # Отключаем выбор
-        # Пролистывание вниз при добавлении нового элемента в консоль
-        scrollBar = self.Console.verticalScrollBar()
-        scrollBar.setValue(scrollBar.maximum())
+        self.ConsoleSlot = GameLauncher.GetConsoleMessage()
+        self.ConsoleSlot.message_signal.connect(self.Console.addItem)
         # Стартовое сообщение
-        self.add_message_to_console("Launcher started")
+        self.Console.addItem("Launcher started")
 
         # Spacer
         spacerItem1 = QtWidgets.QSpacerItem(100, 50, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
@@ -331,19 +324,6 @@ Designer / Community manager - Xeenomiya
         # self.patchButton.setText(_translate("MainWindow", "patchButton"))
         # self.FolderWithGame.setText(_translate("MainWindow", "folderButton"))
         # self.PlayButton.setText(_translate("MainWindow", "Play"))
-
-    def add_message_to_console(self, message):
-        # Создаем новый элемент списка с заданным стилем
-        item = QtGui.QStandardItem(message)
-        item.setFont(QtGui.QFont("Consolas", 11))
-        item.setForeground(QtGui.QBrush(QtGui.QColor("orange")))
-        
-        # Устанавливаем флаги, чтобы элемент не был редактируемым и не нажимаемым
-        item.setFlags(QtCore.Qt.ItemIsSelectable)  # Только выбор, без редактирования
-        
-        # Добавляем элемент в модель
-        self.model.appendRow(item)
-        self.Console.scrollToBottom()
 
 if __name__ == "__main__":
     import sys

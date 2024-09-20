@@ -2,6 +2,7 @@ import os
 import subprocess
 import threading
 import minecraft_launcher_lib
+from PyQt5.QtCore import QObject, pyqtSignal
 from webdav3.client import Client
 from ConfigHandler import create_default_config
 import secret
@@ -21,6 +22,16 @@ aoh_config_file = os.path.join(minecraft_path, "AoHConfig.ini")
 folder_version = os.path.join(minecraft_path, "versions")
 # Переменная для хранения версии Forge
 forge_version_name = None
+
+class ConsoleMessageClass(QObject):
+    message_signal = pyqtSignal(str)
+    
+    def Send (self, message):
+        self.message_signal.emit(message)
+        
+ConsoleMessage = ConsoleMessageClass() # создаю экземпляр чтобы можно было потом выгрузить его в Main
+def GetConsoleMessage():
+    return ConsoleMessage
 
 # Функция для проверки установки игры при запуске
 def check_game_installed():
@@ -65,11 +76,11 @@ def install_in_background():
         forge_version_name = minecraft_launcher_lib.forge.install_forge_version(forge_version, minecraft_path)
         cloudDownload() # Добавил еще раз эту функцию здесь, так как в MainLauncher не работало
         DownloadCompleted = True
-        print("Forge установлен")
+        ConsoleMessage.Send("Forge установлен")
         on_installation_complete()
         return DownloadCompleted
     else:
-        print("Forge версия не найдена для данной версии Minecraft")
+        ConsoleMessage.Send("Forge версия не найдена для данной версии Minecraft")
     
     # root.after(0, on_installation_complete)
     # root.after(0, on_installation_complete) # Строчка вызывает ошибку
@@ -92,24 +103,24 @@ def cloudDownload (): # ЭТА КЭЭМЕЛ КЕЙС
 def on_installation_complete():
     global is_game_installed
     is_game_installed = True
-    print("Игра и Forge установлены")
+    ConsoleMessage.Send("Игра и Forge установлены")
 
 # Кнопка запуска игры
 def launch_game(username):
     # check_game_installed() # Temp line
     if is_game_installed and forge_version_name:
         if username:
-            print(f"Запуск игры с никнеймом: {username}")
+            ConsoleMessage.Send(f"Запуск игры с никнеймом: {username}")
             # Используем версию Forge для запуска
             command = minecraft_launcher_lib.command.get_minecraft_command\
                 (forge_version_name, minecraft_path, {"username": username})
             CREATE_NO_WINDOW = 0x08000000
             subprocess.call(command, creationflags=CREATE_NO_WINDOW)
         else:
-            print("Пожалуйста, введите никнейм")
+            ConsoleMessage.Send("Пожалуйста, введите никнейм")
 
 
-print(f"Путь установки: {minecraft_path}")
+ConsoleMessage.Send(f"Путь установки: {minecraft_path}")
 
 # Проверяем, установлена ли игра при запуске лаунчера
 check_game_installed()

@@ -4,7 +4,8 @@
 /build
 /__pycache__
 /dist
-\#*\#
+.#*
+/#*.py#
 _*.*
 *.*~
 *.spec

@@ -167,6 +167,22 @@ class ThemeNew(QtWidgets.QMainWindow):
             color: #f2b036;
             border: none;
         }
+        QListWidget {
+            font-family: 'Consolas';
+            font-size: 14px;
+            outline: 0;
+        }
+        QListWidget::item:hover {
+            background: transparent;
+        }
+        QListWidget::item:selected {
+            background: transparent;
+            color: #f2b036; /* иначе сбросится */
+            border: none;
+        }
+        QListWidget::item:focus {
+            border: none;  /* Убирает границу фокуса для отдельных элементов */
+        }
         QLabel#image_label {
             qproperty-pixmap: url("cache/Launcher_logo.png");
             qproperty-scaledContents: true;
