@@ -73,6 +73,15 @@ class Ui_MainWindow(object):
         else:
             self.PlayButton.setText("Install game")
 
+    def ButtonMessage(self):
+        if not os.path.exists(GameLauncher.folder_version):
+            self.Console.addItem("""Starting of downloading game!
+Please do not close this window!""")
+            self.launch_game_pressed()
+        else:
+            self.launch_game_pressed()
+
+
     def setupUi(self, MainWindow):
         icon_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'cache', 'aoh_icon.ico'))
         app_icon = QtGui.QIcon(icon_path)
@@ -174,11 +183,11 @@ class Ui_MainWindow(object):
         self.settings_menu.addAction(self.Delete)
 
         def ShowCredits():
-            self.Console.addItem("""---================---
-CEO of project - Scavenger (Evaringos)
-Core programmer - Stradlater25
-Designer / Community manager - Xeenomiya
----================---""")
+            self.Console.addItem("---================---")
+            self.Console.addItem("CEO of project - Scavenger (Evaringos)")
+            self.Console.addItem("Core programmer - Stradlater25")
+            self.Console.addItem("Designer / Community manager - Xeenomiya")
+            self.Console.addItem("---================---")
         
         def DeleteMinecraft():
             MinecraftDestroyer.DestroyIt()
@@ -290,7 +299,8 @@ Designer / Community manager - Xeenomiya
         font.setPointSize(18)
         font.setWeight(QtGui.QFont.Bold)  # или font.setWeight(75) для более тонкого шрифта
         self.PlayButton.setFont(font)
-        self.PlayButton.clicked.connect(self.launch_game_pressed)  
+        self.PlayButton.clicked.connect(self.ButtonMessage)
+        # self.PlayButton.clicked.connect(self.launch_game_pressed)  
         self.verticalLayout.addWidget(self.PlayButton)
 
         # Progress bar устаноки игры
@@ -334,3 +344,5 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
+
+# Изменить scroll bar у Console

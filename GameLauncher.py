@@ -76,11 +76,11 @@ def install_in_background():
         forge_version_name = minecraft_launcher_lib.forge.install_forge_version(forge_version, minecraft_path)
         cloudDownload() # Добавил еще раз эту функцию здесь, так как в MainLauncher не работало
         DownloadCompleted = True
-        ConsoleMessage.Send("Forge установлен")
+        ConsoleMessage.Send("Forge has been installed")
         on_installation_complete()
         return DownloadCompleted
     else:
-        ConsoleMessage.Send("Forge версия не найдена для данной версии Minecraft")
+        ConsoleMessage.Send("Can't find forge version for Minecraft")
     
     # root.after(0, on_installation_complete)
     # root.after(0, on_installation_complete) # Строчка вызывает ошибку
@@ -103,24 +103,26 @@ def cloudDownload (): # ЭТА КЭЭМЕЛ КЕЙС
 def on_installation_complete():
     global is_game_installed
     is_game_installed = True
-    ConsoleMessage.Send("Игра и Forge установлены")
+    # ConsoleMessage.Send("Игра и Forge установлены")
+    ConsoleMessage.Send("The game and for forge has been installed")
+    ConsoleMessage.Send("The game is ready to launch!")
 
 # Кнопка запуска игры
 def launch_game(username):
     # check_game_installed() # Temp line
     if is_game_installed and forge_version_name:
         if username:
-            ConsoleMessage.Send(f"Запуск игры с никнеймом: {username}")
+            ConsoleMessage.Send(f"Launching game with username: {username}")
             # Используем версию Forge для запуска
             command = minecraft_launcher_lib.command.get_minecraft_command\
                 (forge_version_name, minecraft_path, {"username": username})
             CREATE_NO_WINDOW = 0x08000000
             subprocess.call(command, creationflags=CREATE_NO_WINDOW)
         else:
-            ConsoleMessage.Send("Пожалуйста, введите никнейм")
+            ConsoleMessage.Send("Can't launch the game without username!")
 
 
-ConsoleMessage.Send(f"Путь установки: {minecraft_path}")
+ConsoleMessage.Send(f"Installing path: {minecraft_path}")
 
 # Проверяем, установлена ли игра при запуске лаунчера
 check_game_installed()
