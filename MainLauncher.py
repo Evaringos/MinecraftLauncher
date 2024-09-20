@@ -7,7 +7,7 @@ from PyQt5.QtCore import QUrl, QSize
 from PyQt5.QtSvg import QSvgRenderer
 from ConfigHandler import update_config, read_config, create_default_config
 from Themes import ThemeNew
-from GameFolderDestroyer import MinecraftDestroyer
+import GameFolderDestroyer
 
 config = read_config()
 
@@ -190,7 +190,7 @@ Please do not close this window!""")
             self.Console.addItem("---================---")
         
         def DeleteMinecraft():
-            MinecraftDestroyer.DestroyIt()
+            GameFolderDestroyer.MinecraftDestroyer.DestroyIt()
             self.ButtonTextChange()
         
         self.SettingsButton.setMenu(self.settings_menu) # Привязываем меню к кнопке
@@ -204,7 +204,7 @@ Please do not close this window!""")
         self.toolbar.addWidget(self.FolderWithGame)
         # Метод для открытия папки
         def open_folder():
-            if os.path.exists(GameLauncher.minecraft_path):
+            if os.path.exists(GameLauncher.launcher_path):
                 QDesktopServices.openUrl(QUrl.fromLocalFile(game_folder_path))
             else:
                 self.Console.addItem("The game is not installed yet")
@@ -257,7 +257,9 @@ Please do not close this window!""")
         self.Console.setObjectName("Console")
         self.verticalLayout.addWidget(self.Console)
         self.ConsoleSlot = GameLauncher.GetConsoleMessage()
+        self.ConsoleSlot2 = GameFolderDestroyer.GetConsoleMessage()
         self.ConsoleSlot.message_signal.connect(self.Console.addItem)
+        self.ConsoleSlot2.message_signal.connect(self.Console.addItem)
         # Стартовое сообщение
         self.Console.addItem("Launcher started")
 
