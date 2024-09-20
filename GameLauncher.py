@@ -2,9 +2,9 @@ import os
 import subprocess
 import threading
 import minecraft_launcher_lib
+import ConfigHandler
 from PyQt5.QtCore import QObject, pyqtSignal
 from webdav3.client import Client
-from ConfigHandler import create_default_config
 import secret
 
 
@@ -17,8 +17,10 @@ base_version = "1.20.1"
 DownloadCompleted = False
 
 # Путь установки игры, модов, конфигов
-minecraft_path = os.path.expanduser('~\\AppData\\Roaming\\.AoHLauncher')
-aoh_config_file = os.path.join(minecraft_path, "AoHConfig.ini")
+launcher_path = os.path.expanduser('~\\AppData\\Roaming\\.AoHLauncher')
+minecraft_path = os.path.expanduser('~\\AppData\\Roaming\\.AoHLauncher\\AoHMinecraft')
+# minecraft_path = os.path.expanduser('~\\AppData\\Roaming\\.AoHLauncher')
+aoh_config_file = os.path.join(launcher_path, "AoHConfig.ini")
 folder_version = os.path.join(minecraft_path, "versions")
 # Переменная для хранения версии Forge
 forge_version_name = None
@@ -47,9 +49,9 @@ def check_game_installed():
 
 # Есть ли файл конфигурации
 def check_configfile():
-    if not os.path.exists(minecraft_path): 
-        os.mkdir(minecraft_path)
-        create_default_config()
+    if not os.path.exists(launcher_path): 
+        os.mkdir(launcher_path)
+        ConfigHandler.create_default_config()
 
 
 #    if not os.path.isfile(aoh_config_file): create_default_config()
