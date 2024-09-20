@@ -3,6 +3,7 @@ from PyQt5 import QtWidgets, QtCore # Добавил QtCore
 # AoHClassic
 # ColAccent = "#f2b036"
 # ColBg = "#eaeaea"
+#This is a test***
 
 # Classic92
 # ColAccent = "#f2b036"
