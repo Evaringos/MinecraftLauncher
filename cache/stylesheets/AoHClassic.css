@@ -1,0 +1,92 @@
+QMainWindow {
+    background: qlineargradient(x1:0, y1:0, x0:1, y2:1, 
+				stop:0 #2f0552, stop:1 #200338);
+}
+QMenu { /*Dropdown menu*/
+    background-color: #330d52;
+    border: 1px solid #7d1dcc;                           
+    color: #b17dff;
+}
+QMenu:hover { /*Dropdown menu*/              
+    color: #601fc2;
+}
+QToolBar {
+    border: none;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, 
+				stop:0 #2f0552, stop:1 #7d1dcc);
+}
+QLineEdit { /* Username input area */
+    border-radius: 5px;
+    border: 1px solid #7d1dcc;
+    background-color: #3a0d5e;
+    padding: 2px;
+    font-family: 'Consolas', monospace;
+    /* font-size: 14px; */
+    color: #b17dff;
+}
+QListView { /* Console box*/
+    border-radius: 5px;
+    border: 1px solid #7d1dcc;
+    background-color: #3a0d5e;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, 
+				stop:0 #2b0847, stop:1 #3a0d5e);                           
+    color: #b17dff;
+}
+QPushButton {
+    border-radius: 5px;
+    border: 2px solid #7d1dcc;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+				      stop: 0 #2b0847, stop: 1 #3a0d5e);
+    padding: 2px;
+    font-family: 'Consolas', monospace;
+    font-size: 18px;
+    font-weight: bold;
+    color: #b17dff;
+}
+QPushButton:hover {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+				      stop: 0 #61199c, stop: 1 #601fc2);
+    border: 1px solid #61199c;
+}
+QPushButton:pressed {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+				      stop: 0 #61199c, stop: 1 #2f0552);
+    border: 1px solid #61199c;
+}
+QProgressBar {
+    border: 1px solid #7d1dcc;
+    border-radius: 5px;
+    background-color: #601fc2;
+}
+QProgressBar::chunk {
+    background-color: #b17dff;
+    border-radius: 5px;
+}
+QToolTip {
+    background-color : #601fc2;
+    color: #b17dff;
+    border: none;
+}
+QListWidget {
+    font-family: 'Consolas';
+    font-size: 14px;
+    outline: 0;
+}
+QListWidget::item:hover {
+    background: transparent;
+}
+QListWidget::item:selected {
+    background: transparent;
+    color: #b17dff; /* иначе сбросится */
+    border: none;
+}
+QListWidget::item:focus {
+    border: none;  /* Убирает границу фокуса для отдельных элементов */
+}
+QLabel#image_label {
+    qproperty-pixmap: url("cache/Launcher_logo_dark.png");
+    qproperty-scaledContents: true;
+}
+QMenu::item:selected {
+    background-color: #401463;
+}
