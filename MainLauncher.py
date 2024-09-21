@@ -1,13 +1,13 @@
-import sys
-import os
+import sys, os
 import GameLauncher
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import QColor, QIcon, QDesktopServices, QPainter, QPixmap
+from PyQt5.QtGui import QColor, QIcon, QDesktopServices, QPainter, QPalette, QPixmap
 from PyQt5.QtCore import QUrl, QSize
 from PyQt5.QtSvg import QSvgRenderer
 from ConfigHandler import update_config, read_config, create_default_config
-from Themes import ThemeNew
+from Themes import Theme
 import GameFolderDestroyer
+
 
 config = read_config()
 
@@ -42,13 +42,28 @@ class NoClickModel(QtCore.QStringListModel):
 class Ui_MainWindow(object):
     def __init__(self):
         self.settings = QtCore.QSettings("AoH Launcher", "Settings")
+
+    def refresh_icons (self):
+        self.SettingsButton.setIcon(QIcon(Theme.Icon.SVGIcon("settings")))
+        self.FolderWithGame.setIcon(QIcon(Theme.Icon.SVGIcon("folder")))
+        self.Refresh.setIcon(QIcon(Theme.Icon.SVGIcon("reload")))
+        self.HideWindow.setIcon(QIcon(Theme.Icon.SVGIcon("hide")))
+        self.CloseWindow.setIcon(QIcon(Theme.Icon.SVGIcon("close")))
+        self.Credits.setIcon(QIcon(Theme.Icon.SVGIcon("info")))
+        self.language_menu.setIcon(QIcon(Theme.Icon.SVGIcon("globe")))
+        self.theme_menu.setIcon(QIcon(Theme.Icon.SVGIcon("brush")))
         
     def update_theme(self, theme=None):
         # AoHClassic по дефолту
         if theme :
-            ThemeNew.SetTheme(MainWindow,theme)
+            Theme.SetTheme(MainWindow,theme)
             update_config("Launcher", "Theme", theme)
-        else: ThemeNew.SetTheme(MainWindow,config["Launcher"]["theme"])
+            self.refresh_icons()
+        else:
+            if not Theme.SetTheme(MainWindow,config["Launcher"]["theme"]):
+                update_config("Launcher", "theme", "Classic92")
+                Theme.SetTheme(MainWindow,config["Launcher"]["theme"])
+                self.refresh_icons()
 
 
     def launch_game_pressed(self):
@@ -72,7 +87,7 @@ class Ui_MainWindow(object):
             self.PlayButton.setText("Play")
         else:
             self.PlayButton.setText("Install game")
-
+          
     def ButtonMessage(self):
         if not os.path.exists(GameLauncher.folder_version):
             self.Console.addItem("""Starting of downloading game!
@@ -81,12 +96,13 @@ Please do not close this window!""")
         else:
             self.launch_game_pressed()
 
+  
+
 
     def setupUi(self, MainWindow):
-        icon_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'cache', 'aoh_icon.ico'))
+        icon_path = ('cache/aoh_icon.ico')
         app_icon = QtGui.QIcon(icon_path)
         app.setWindowIcon(app_icon)
-        self.update_theme()
         MainWindow.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint) # отключение рамки окна
 
         MainWindow.setObjectName("MainWindow")
@@ -109,40 +125,29 @@ Please do not close this window!""")
         self.toolbar.setFixedHeight(32)
         self.toolbar.setContextMenuPolicy(QtCore.Qt.PreventContextMenu) # Отключение встроенной функции удаления тулбара
 
-        # Иконки для кнопок
-        icon_paths = {
-            "close": os.path.join('cache', 'icons', 'close.svg'),
-            "settings": os.path.join('cache', 'icons', 'cogwheel.svg'),
-            "hide": os.path.join('cache', 'icons', 'hide.svg'),
-            "folder": os.path.join('cache', 'icons', 'folder.svg'),
-            "refresh": os.path.join('cache', 'icons', 'reload.svg'),
-            "globe": os.path.join('cache', 'icons', 'globe.svg'),
-            "brush": os.path.join('cache', 'icons', 'brush.svg'),
-            "info": os.path.join('cache', 'icons', 'info.svg'),
-            "bin": os.path.join('cache', 'icons', 'bin.svg')
-        }
         game_folder_path = os.path.join(os.getenv('APPDATA'), '.AoHLauncher')
 
         # Настройка кнопки Settings
         self.SettingsButton = QtWidgets.QPushButton()
         self.SettingsButton.setFixedSize(32, 32)
-        self.SettingsButton.setIcon(QIcon(icon_paths["settings"]))
+        # self.SettingsButton.setIcon.conn
+        # self.SettingsButton.setIcon(QIcon(icon_paths["settings"]))
         self.toolbar.addWidget(self.SettingsButton)
 
         
         # Создаем выпадающее меню (dropdown menu)
         self.settings_menu = QtWidgets.QMenu(MainWindow)
         self.theme_menu = QtWidgets.QMenu("Themes settings", self.settings_menu)
-        self.theme_menu.setIcon(QIcon(icon_paths["brush"]))
+        # self.theme_menu.setIcon(QIcon(icon_paths["brush"]))
         
         self.language_menu = QtWidgets.QMenu("Language settings", self.settings_menu)
-        self.language_menu.setIcon(QIcon(icon_paths["globe"]))
+        # self.language_menu.setIcon(QIcon(icon_paths["globe"]))
 
         self.Credits = QtWidgets.QAction("Credits", self.settings_menu)
-        self.Credits.setIcon(QIcon(icon_paths["info"]))
+        # self.Credits.setIcon(QIcon(icon_paths["info"]))
 
         self.Delete = QtWidgets.QAction("Delete Minecraft", self.settings_menu)
-        self.Delete.setIcon(QIcon(icon_paths["bin"]))
+        # self.Delete.setIcon(QIcon(icon_paths["bin"]))
 
         # Создаём группу действий для темы
         self.theme_menu_group = QtWidgets.QActionGroup(MainWindow)
@@ -199,7 +204,7 @@ Please do not close this window!""")
         # Папка с игрой
         self.FolderWithGame = QtWidgets.QPushButton()
         self.FolderWithGame.setFixedSize(32, 32)
-        self.FolderWithGame.setIcon(QIcon(icon_paths["folder"]))
+        # self.FolderWithGame.setIcon(QIcon(icon_paths["folder"]))
         self.FolderWithGame.setToolTip("Open game folder")
         self.toolbar.addWidget(self.FolderWithGame)
         # Метод для открытия папки
@@ -215,7 +220,7 @@ Please do not close this window!""")
         self.Refresh = QtWidgets.QPushButton()
         self.Refresh.setToolTip("Reinstall mods")
         self.Refresh.setFixedSize(32, 32)
-        self.Refresh.setIcon(QIcon(icon_paths["refresh"]))
+        # self.Refresh.setIcon(QIcon(icon_paths["refresh"]))
         self.toolbar.addWidget(self.Refresh)
 
         # def refresh_mods():
@@ -228,14 +233,14 @@ Please do not close this window!""")
         # Hide window button
         self.HideWindow = QtWidgets.QPushButton()
         self.HideWindow.setFixedSize(32, 32)
-        self.HideWindow.setIcon(QIcon(icon_paths["hide"]))
+        # self.HideWindow.setIcon(QIcon(icon_paths["hide"]))
         self.HideWindow.setToolTip("Hide")
         self.HideWindow.clicked.connect(MainWindow.showMinimized)
         self.toolbar.addWidget(self.HideWindow)
         # Close window button
         self.CloseWindow = QtWidgets.QPushButton()
         self.CloseWindow.setFixedSize(32, 32)
-        self.CloseWindow.setIcon(QIcon(icon_paths["close"]))
+        # self.CloseWindow.setIcon(QIcon(icon_paths["close"]))
         self.CloseWindow.setToolTip("Close")        
         self.CloseWindow.clicked.connect(self.save_username_and_exit)
         self.toolbar.addWidget(self.CloseWindow)
@@ -260,8 +265,8 @@ Please do not close this window!""")
         self.ConsoleSlot2 = GameFolderDestroyer.GetConsoleMessage()
         self.ConsoleSlot.message_signal.connect(self.Console.addItem)
         self.ConsoleSlot2.message_signal.connect(self.Console.addItem)
-        # Стартовое сообщение
         self.Console.addItem("Launcher started")
+        
 
         # Spacer
         spacerItem1 = QtWidgets.QSpacerItem(100, 50, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
@@ -328,6 +333,8 @@ Please do not close this window!""")
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.update_theme()
+
 
     # Launcher Translate
     def retranslateUi(self, MainWindow):
@@ -339,7 +346,6 @@ Please do not close this window!""")
 
 if __name__ == "__main__":
     import sys
-    
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
