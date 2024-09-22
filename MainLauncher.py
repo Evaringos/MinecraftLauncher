@@ -2,7 +2,7 @@ import sys, os
 import GameLauncher
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QColor, QIcon, QDesktopServices, QPainter, QPalette, QPixmap
-from PyQt5.QtCore import QUrl, QSize
+from PyQt5.QtCore import QUrl, QSize, pyqtSignal
 from PyQt5.QtSvg import QSvgRenderer
 from ConfigHandler import update_config, read_config, create_default_config
 from Themes import Theme
@@ -42,6 +42,8 @@ class NoClickModel(QtCore.QStringListModel):
 class Ui_MainWindow(object):
     def __init__(self):
         self.settings = QtCore.QSettings("AoH Launcher", "Settings")
+        self.game_installed = GameLauncher.GameInstalled()  # Создаем экземпляр класса GameInstalled
+        self.game_installed.installed_signal.connect(self.GameInstallingDone)
 
     def refresh_icons (self):
         self.SettingsButton.setIcon(QIcon(Theme.Icon.SVGIcon("settings")))
@@ -52,6 +54,7 @@ class Ui_MainWindow(object):
         self.Credits.setIcon(QIcon(Theme.Icon.SVGIcon("info")))
         self.language_menu.setIcon(QIcon(Theme.Icon.SVGIcon("globe")))
         self.theme_menu.setIcon(QIcon(Theme.Icon.SVGIcon("brush")))
+        self.Delete.setIcon(QIcon(Theme.Icon.SVGIcon("bin")))
         
     def update_theme(self, theme=None):
         # AoHClassic по дефолту
@@ -65,39 +68,36 @@ class Ui_MainWindow(object):
                 Theme.SetTheme(MainWindow,config["Launcher"]["theme"])
                 self.refresh_icons()
 
-
-    def launch_game_pressed(self):
-        if os.path.exists(GameLauncher.folder_version):
+    def PlayButtonPressed(self):
+        if not os.path.exists(GameLauncher.folder_version):
+            self.Console.addItem("Starting of downloading game!")
+            self.Console.addItem("Please do not close this window!")
+            self.PlayButton.setEnabled(False) # Кнопка недоступная для нажатия должна выглядить по другому
+            self.progressBar.setVisible(True)
+            GameLauncher.install_game()
+        elif os.path.exists(GameLauncher.folder_version):
             MainWindow.hide()
             GameLauncher.launch_game(self.Username.text())
             MainWindow.show()
+            self.Console.addItem("Play session has been ended!")
         else:
-            GameLauncher.install_game()
-            # GameLauncher.cloudDownload()
-            if GameLauncher.DownloadCompleted == True:
-                self.ButtonTextChange()
-                
-
-    def save_username_and_exit(self):
-        update_config("Launcher", "Username", self.Username.text())
-        MainWindow.close()
+            self.Console.addItem("Unknown command!")
 
     def ButtonTextChange(self): # Не знаю куда ещё подцепить эту функцию :/
         if os.path.exists(GameLauncher.folder_version):
             self.PlayButton.setText("Play")
         else:
             self.PlayButton.setText("Install game")
-          
-    def ButtonMessage(self):
-        if not os.path.exists(GameLauncher.folder_version):
-            self.Console.addItem("""Starting of downloading game!
-Please do not close this window!""")
-            self.launch_game_pressed()
-        else:
-            self.launch_game_pressed()
+    
+    def GameInstallingDone(self):
+        self.PlayButton.setText("Play")
+        self.PlayButton.setEnabled(True)
+        self.progressBar.setVisible(False)
+        self.Console.addItem("The game is ready to launch!")
 
-  
-
+    def save_username_and_exit(self):
+        update_config("Launcher", "Username", self.Username.text())
+        MainWindow.close()
 
     def setupUi(self, MainWindow):
         icon_path = ('cache/aoh_icon.ico')
@@ -306,14 +306,14 @@ Please do not close this window!""")
         font.setPointSize(18)
         font.setWeight(QtGui.QFont.Bold)  # или font.setWeight(75) для более тонкого шрифта
         self.PlayButton.setFont(font)
-        self.PlayButton.clicked.connect(self.ButtonMessage)
+        self.PlayButton.clicked.connect(self.PlayButtonPressed)
         # self.PlayButton.clicked.connect(self.launch_game_pressed)  
         self.verticalLayout.addWidget(self.PlayButton)
 
         # Progress bar устаноки игры
         self.progressBar = QtWidgets.QProgressBar(self.centralwidget)
         self.progressBar.setEnabled(True)
-        self.progressBar.setVisible(True) # Видимость progress bar
+        self.progressBar.setVisible(False) # Видимость progress bar
         self.progressBar.setMinimumSize(QtCore.QSize(100, 20))
         font = QtGui.QFont()
         font.setBold(False)
@@ -354,3 +354,4 @@ if __name__ == "__main__":
     sys.exit(app.exec_())
 
 # Изменить scroll bar у Console
+# Добавить визуал на фон лаунчера

@@ -14,8 +14,6 @@ is_game_installed = False
 # Базовая версия игры
 base_version = "1.20.1"
 
-DownloadCompleted = False
-
 # Путь установки игры, модов, конфигов
 launcher_path = os.path.expanduser('~\\AppData\\Roaming\\.AoHLauncher')
 minecraft_path = os.path.expanduser('~\\AppData\\Roaming\\.AoHLauncher\\AoHMinecraft')
@@ -77,10 +75,8 @@ def install_in_background():
     if forge_version:
         forge_version_name = minecraft_launcher_lib.forge.install_forge_version(forge_version, minecraft_path)
         cloudDownload() # Добавил еще раз эту функцию здесь, так как в MainLauncher не работало
-        DownloadCompleted = True
         ConsoleMessage.Send("Forge has been installed")
-        on_installation_complete()
-        return DownloadCompleted
+        GameInstalled.on_installation_complete()
     else:
         ConsoleMessage.Send("Can't find forge version for Minecraft")
     
@@ -99,15 +95,16 @@ def cloudDownload (): # ЭТА КЭЭМЕЛ КЕЙС
     client.download_file("minecraft/options.txt", os.path.join(minecraft_path, "options.txt"))
     client.download("minecraft/config", os.path.join(minecraft_path, "config"))
     client.download("minecraft/mods", os.path.join(minecraft_path, "mods"))
-    
-    
-# Функция для завершения установки
-def on_installation_complete():
-    global is_game_installed
-    is_game_installed = True
-    # ConsoleMessage.Send("Игра и Forge установлены")
-    ConsoleMessage.Send("The game and for forge has been installed")
-    ConsoleMessage.Send("The game is ready to launch!")
+
+class GameInstalled(QObject):
+    installed_signal = pyqtSignal()
+    # Функция для завершения установки
+    @staticmethod
+    def on_installation_complete(self):
+        global is_game_installed
+        is_game_installed = True
+        self.installed_signal.emit()
+        check_game_installed()
 
 # Кнопка запуска игры
 def launch_game(username):
