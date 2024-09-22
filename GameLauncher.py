@@ -76,6 +76,7 @@ def install_in_background():
         forge_version_name = minecraft_launcher_lib.forge.install_forge_version(forge_version, minecraft_path)
         cloudDownload() # Добавил еще раз эту функцию здесь, так как в MainLauncher не работало
         ConsoleMessage.Send("Forge has been installed")
+        # на этой строчке зависает
         GameInstalled.on_installation_complete()
     else:
         ConsoleMessage.Send("Can't find forge version for Minecraft")
@@ -100,10 +101,11 @@ class GameInstalled(QObject):
     installed_signal = pyqtSignal()
     # Функция для завершения установки
     @staticmethod
-    def on_installation_complete(self):
+    def on_installation_complete():
         global is_game_installed
         is_game_installed = True
-        self.installed_signal.emit()
+        game_installed = GameInstalled()
+        game_installed.installed_signal.emit()
         check_game_installed()
 
 # Кнопка запуска игры
