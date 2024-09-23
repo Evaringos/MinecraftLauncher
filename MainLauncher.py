@@ -56,12 +56,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 Theme.SetTheme(self, config["Launcher"]["theme"])
                 self.refresh_icons()
 
+    # Button handler
     def PlayButtonPressed(self):
         self.SettingsButton.setEnabled(False)
         if not os.path.exists(GameLauncher.folder_version):
+            self.InstallingProcess()
             self.Console.addItem("Starting of downloading game!")
             self.Console.addItem("Please do not close this window!")
-            self.PlayButton.setEnabled(False) # Кнопка недоступная для нажатия должна выглядить по другому
+            self.PlayButton.setEnabled(False) 
             self.progressBar.setVisible(True)
             GameLauncher.install_game()
         elif os.path.exists(GameLauncher.folder_version):
@@ -72,11 +74,32 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         else:
             self.Console.addItem("Unknown command!")
 
-    def ButtonTextChange(self): # Не знаю куда ещё подцепить эту функцию :/
+    # Button statement update
+    def ButtonTextChange(self): 
         if os.path.exists(GameLauncher.folder_version):
             self.PlayButton.setText("Play")
         else:
             self.PlayButton.setText("Install game")
+
+    # Insalling text functions:
+    def InstallingProcess(self):
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.UpdateInstallingText)
+        self.timer.start(500)  # 500 milliseconds = 0.5 seconds
+
+    def InstallationComplete(self):
+        self.timer.stop()  # Timer stops when installing is done
+        self.ButtonTextChange()
+
+    def UpdateInstallingText(self):
+        texts = ["Installing.  ", "Installing.. ", "Installing..."]
+        current_text = self.PlayButton.text()
+        if current_text in texts:
+            index = texts.index(current_text)
+            next_index = (index + 1) % len(texts)
+            self.PlayButton.setText(texts[next_index])
+        else:
+            self.PlayButton.setText(texts[0])
     
     def GameInstallingDone(self):
         self.PlayButton.setText("Play")

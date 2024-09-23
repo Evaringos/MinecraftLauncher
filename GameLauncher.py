@@ -32,20 +32,18 @@ class ConsoleMessageClass(QObject):
 
 class GameInstalledClass(QObject):
     installed_signal = pyqtSignal()
-
-    def Send (self):
+    
+    def signalis(self):
         self.installed_signal.emit()
-
         
 ConsoleMessage = ConsoleMessageClass() # создаю экземпляр чтобы можно было потом выгрузить его в Main
-InstallTrigger = ConsoleMessageClass()
-
+GameInstalled = GameInstalledClass()
 
 def GetConsoleMessage():
     return ConsoleMessage
 
-def Getinstalledtrigger():
-    return InstallTrigger
+def GetGameInstalled():
+    return GameInstalled
 
 # Функция для проверки установки игры при запуске
 def check_game_installed():
@@ -101,8 +99,11 @@ def install_in_background():
         forge_version_name = minecraft_launcher_lib.forge.install_forge_version(forge_version, minecraft_path)
         
         ConsoleMessage.Send("Forge has been installed")
-        CloudDownload() # Добавил еще раз эту функцию здесь, так как в MainLauncher не работало
-        GameInstalled.on_installation_complete() # на этой строчке зависает
+        # на этой строчке зависает
+        global is_game_installed
+        is_game_installed = True
+        check_game_installed()
+        GameInstalled.signalis()
     else:
         ConsoleMessage.Send("Can't find forge version for Minecraft")
     
@@ -113,17 +114,6 @@ def install_in_background():
 
 # Скачивание модов и конфига
 
-
-class GameInstalled(QObject):
-    installed_signal = pyqtSignal()
-    # Функция для завершения установки
-    @staticmethod
-    def on_installation_complete():
-        global is_game_installed
-        is_game_installed = True
-        game_installed = GameInstalled()
-        game_installed.installed_signal.emit()
-        check_game_installed()
 
 # Кнопка запуска игры
 def launch_game(username):
