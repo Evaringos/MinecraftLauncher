@@ -1,6 +1,7 @@
 import sys, os
 import GameLauncher
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QGraphicsOpacityEffect
 from PyQt5.QtGui import QColor, QIcon, QDesktopServices, QPainter, QPalette, QPixmap
 from PyQt5.QtCore import QPoint, QUrl, QSize, Qt, pyqtSignal
 from PyQt5.QtSvg import QSvgRenderer
@@ -311,28 +312,23 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.PlayButton.setObjectName("PlayButton")
         self.ButtonTextChange()
         self.PlayButton.clicked.connect(self.PlayButtonPressed)
-        self.verticalLayout.addWidget(self.PlayButton)        
-        # self.PlayButton.clicked.connect(self.launch_game_pressed)  
+        self.verticalLayout.addWidget(self.PlayButton)
+        # self.PlayButton.clicked.connect(self.launch_game_pressed)
 
-
-        # Progress bar устаноки игры
+        # Progressbar внутри кнопки play
         self.progressBar = QtWidgets.QProgressBar()
-        self.progressBar.setEnabled(True)
-        self.progressBar.setVisible(False) # Видимость progress bar
-        self.progressBar.setMinimumSize(QtCore.QSize(100, 20))
-        font = QtGui.QFont()
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.progressBar.setFont(font)
-        self.progressBar.setAcceptDrops(False)
-        self.progressBar.setProperty("value", 24)
+        self.progressBar.setVisible(True)  # Видимость прогресс-бара
         self.progressBar.setTextVisible(False)
-        self.progressBar.setInvertedAppearance(False)
-        self.progressBar.setObjectName("progressBar")
-        self.verticalLayout.addWidget(self.progressBar)
-        self.horizontalLayout.addLayout(self.verticalLayout)
-        
+        effect = QGraphicsOpacityEffect(self.progressBar)
+        effect.setOpacity(0.3)
+        self.progressBar.setGraphicsEffect(effect)
+        self.progressBar.setValue(100)
+
+        # Добавляем прогресс-бар к кнопке
+        layout = QtWidgets.QHBoxLayout()
+        layout.addWidget(self.progressBar)
+        self.PlayButton.setLayout(layout)
+              
         #Tail
         self.update_theme()
         # self.retranslateUi()
@@ -368,3 +364,4 @@ if __name__ == "__main__":
 
 # Изменить scroll bar у Console
 # Добавить визуал на фон лаунчера
+# Выровнять Play по центру

@@ -124,3 +124,16 @@ QLabel#image_label {
 QMenu::item:selected {
     background-color: #292828;
 }
+QProgressBar{
+    /* min-height: 42;
+    max-height: 42;
+    border: #f2b036; */
+    margin: 6px;
+    border-radius: 7px;
+    border: 2px solid #f2b036; 
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+				      stop: 0 #1C1C1C, stop: 1 #402701);
+    padding: 0px;
+    min-height: 39px;
+    max-height: 39px;
+}
