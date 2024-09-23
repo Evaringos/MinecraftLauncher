@@ -115,8 +115,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.settings = QtCore.QSettings("AoH Launcher", "Settings")
-        self.game_installed = GameLauncher.GameInstalled()  # Создаем экземпляр класса GameInstalled
-        self.game_installed.installed_signal.connect(self.GameInstallingDone)        
+        self.game_installed = GameLauncher.GetGameInstalled()  # Создаем экземпляр класса GameInstalled
+        self.game_installed.installed_signal.connect(self.GameInstallingDone)
+        self.game_installed.installed_signal.connect(self.InstallationComplete)
 
         app.setWindowIcon(QtGui.QIcon('cache/aoh_icon.ico'))
         self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint) # отключение рамки окна
@@ -350,3 +351,4 @@ if __name__ == "__main__":
 
 # Изменить scroll bar у Console
 # Добавить визуал на фон лаунчера
+# Починить блокировку кнопки настроек после скчивания
