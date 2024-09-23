@@ -39,6 +39,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.language_menu.setIcon(QIcon(Theme.Icon.SVGIcon("globe")))
         self.theme_menu.setIcon(QIcon(Theme.Icon.SVGIcon("brush")))
         self.Delete.setIcon(QIcon(Theme.Icon.SVGIcon("bin")))
+        self.DiscordButton.setIcon(QIcon(Theme.Icon.SVGIcon("discord")))
         
     def update_theme(self, theme=None):
         if theme : # if func called with theme argument
@@ -58,12 +59,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     # Button handler
     def PlayButtonPressed(self):
-        self.SettingsButton.setEnabled(False)
         if not os.path.exists(GameLauncher.folder_version):
             self.InstallingProcess()
             self.Console.addItem("Starting of downloading game!")
             self.Console.addItem("Please do not close this window!")
             self.PlayButton.setEnabled(False) 
+            self.SettingsButton.setEnabled(False)
+            self.Refresh.setEnabled(False)
             self.progressBar.setVisible(True)
             GameLauncher.install_game()
         elif os.path.exists(GameLauncher.folder_version):
@@ -104,6 +106,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def GameInstallingDone(self):
         self.PlayButton.setText("Play")
         self.PlayButton.setEnabled(True)
+        self.SettingsButton.setEnabled(True)
+        self.Refresh.setEnabled(True)
         self.progressBar.setVisible(False)
         self.Console.addItem("The game is ready to launch!")
 
@@ -207,7 +211,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         # Папка с игрой
         self.FolderWithGame = QtWidgets.QPushButton()
-        self.FolderWithGame.setToolTip("Open game folder")
+        self.FolderWithGame.setToolTip("Open folder with game")
         self.FolderWithGame.setProperty("iconprop", True)
         self.toolbar.addWidget(self.FolderWithGame)
 
@@ -220,6 +224,19 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 self.Console.addItem("The game is not installed yet")
         # Подключение метода к нажатию кнопки
         self.FolderWithGame.clicked.connect(open_folder)
+
+        # Ссылка на сервер проекта
+        self.DiscordButton = QtWidgets.QPushButton()
+        self.DiscordButton.setToolTip("Our discord!")
+        self.DiscordButton.setProperty("iconprop", True)
+        self.toolbar.addWidget(self.DiscordButton)
+
+        # Метод для открытия ссылки
+        def OpenDiscord():
+            url = QUrl("https://discord.gg/DTHu4rZjmM")
+            QDesktopServices.openUrl(url)
+        # Подключение метода к нажатию кнопки
+        self.DiscordButton.clicked.connect(OpenDiscord)
 
         # Обновление модов (возможно временная функция)
         self.Refresh = QtWidgets.QPushButton()
@@ -351,4 +368,3 @@ if __name__ == "__main__":
 
 # Изменить scroll bar у Console
 # Добавить визуал на фон лаунчера
-# Починить блокировку кнопки настроек после скчивания

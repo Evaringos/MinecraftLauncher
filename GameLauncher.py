@@ -71,7 +71,7 @@ def CloudDownload():
     from CloudDownload import CloudDownload
     CloudDownload("aohminecraft.zip", launcher_path, minecraft_path)
     end = time.time()
-    ConsoleMessage.Send(f"AoH is downloaded and extracted in {round(end - start)} s!")
+    ConsoleMessage.Send(f"AoH patch is downloaded and extracted in {round(end - start)} s!")
     
     
 
