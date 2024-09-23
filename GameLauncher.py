@@ -91,7 +91,29 @@ def install_game():
 def install_in_background():
     global forge_version_name
     # Установка базовой версии Minecraft
-    minecraft_launcher_lib.install.install_minecraft_version(base_version, minecraft_path)
+
+    current_max = 100
+    
+    def set_status(status: str):
+        print(status)
+
+    def set_progress(progress: int):
+        global current_max
+        if current_max != 0:
+            percentage = int((progress / current_max) * 100)
+            print(f"Progress: {percentage}%")
+
+    def set_max(new_max: int):
+        global current_max
+        current_max = new_max
+
+    callback = {
+        "setStatus": set_status, # This function is called to set a text
+        "setProgress": set_progress, # This function is called to set the progress.
+        "setMax": set_max, # This function is called to set to max progress.
+    }
+    
+    minecraft_launcher_lib.install.install_minecraft_version(base_version, minecraft_path, callback=callback)
     
     # Поиск и установка последней доступной версии Forge для указанной версии Minecraft
     forge_version = minecraft_launcher_lib.forge.find_forge_version(base_version)

@@ -114,6 +114,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def save_username_and_exit(self):
         update_config("Launcher", "Username", self.Username.text())
+        # Починить закрытие майнкрафта
         self.close()
 
 
@@ -317,7 +318,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         # Progressbar внутри кнопки play
         self.progressBar = QtWidgets.QProgressBar()
-        self.progressBar.setVisible(True)  # Видимость прогресс-бара
+        self.progressBar.setVisible(False)  # Видимость прогресс-бара
         self.progressBar.setTextVisible(False)
         effect = QGraphicsOpacityEffect(self.progressBar)
         effect.setOpacity(0.3)
