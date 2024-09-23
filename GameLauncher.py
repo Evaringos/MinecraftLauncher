@@ -1,3 +1,4 @@
+import time
 import os
 import subprocess
 import threading
@@ -5,7 +6,7 @@ import minecraft_launcher_lib
 import ConfigHandler
 from PyQt5.QtCore import QObject, pyqtSignal
 from webdav3.client import Client
-import secret
+
 
 
 # Переменная для проверки установки игры
@@ -15,11 +16,11 @@ is_game_installed = False
 base_version = "1.20.1"
 
 # Путь установки игры, модов, конфигов
-launcher_path = os.path.expanduser('~\\AppData\\Roaming\\.AoHLauncher')
-minecraft_path = os.path.expanduser('~\\AppData\\Roaming\\.AoHLauncher\\AoHMinecraft')
-# minecraft_path = os.path.expanduser('~\\AppData\\Roaming\\.AoHLauncher')
+launcher_path = os.path.expanduser('~/AppData/Roaming/.AoHLauncher')
+minecraft_path = os.path.join(launcher_path, 'AoHMinecraft')
 aoh_config_file = os.path.join(launcher_path, "AoHConfig.ini")
 folder_version = os.path.join(minecraft_path, "versions")
+
 # Переменная для хранения версии Forge
 forge_version_name = None
 
@@ -28,10 +29,23 @@ class ConsoleMessageClass(QObject):
     
     def Send (self, message):
         self.message_signal.emit(message)
+
+class GameInstalledClass(QObject):
+    installed_signal = pyqtSignal()
+
+    def Send (self):
+        self.installed_signal.emit()
+
         
 ConsoleMessage = ConsoleMessageClass() # создаю экземпляр чтобы можно было потом выгрузить его в Main
+InstallTrigger = ConsoleMessageClass()
+
+
 def GetConsoleMessage():
     return ConsoleMessage
+
+def Getinstalledtrigger():
+    return InstallTrigger
 
 # Функция для проверки установки игры при запуске
 def check_game_installed():
@@ -47,12 +61,21 @@ def check_game_installed():
 
 # Есть ли файл конфигурации
 def check_configfile():
-    if not os.path.exists(launcher_path): 
+    if not os.path.exists(launcher_path):
         os.mkdir(launcher_path)
         ConfigHandler.create_default_config()
+    elif os.path.exists(launcher_path) and not os.path.exists(aoh_config_file):
+        ConfigHandler.create_default_config()
 
-
-#    if not os.path.isfile(aoh_config_file): create_default_config()
+# download zip with minecraft patches.
+def CloudDownload():
+    start = time.time()
+    from CloudDownload import CloudDownload
+    CloudDownload("aohminecraft.zip", launcher_path, minecraft_path)
+    end = time.time()
+    ConsoleMessage.Send(f"AoH is downloaded and extracted in {round(end - start)} s!")
+    
+    
 
 # Функция для установки игры
 def install_game():
@@ -61,8 +84,10 @@ def install_game():
 #        on_installation_complete()
 #    else:
     install_thread = threading.Thread(target=install_in_background)
+    cloud_thread = threading.Thread(target=CloudDownload)
     install_thread.start()
-#        cloudDownload()
+    cloud_thread.start()
+    #        cloudDownload()
 
 # Функция для выполнения установки в фоновом режиме
 def install_in_background():
@@ -74,10 +99,10 @@ def install_in_background():
     forge_version = minecraft_launcher_lib.forge.find_forge_version(base_version)
     if forge_version:
         forge_version_name = minecraft_launcher_lib.forge.install_forge_version(forge_version, minecraft_path)
-        cloudDownload() # Добавил еще раз эту функцию здесь, так как в MainLauncher не работало
+        
         ConsoleMessage.Send("Forge has been installed")
-        # на этой строчке зависает
-        GameInstalled.on_installation_complete()
+        CloudDownload() # Добавил еще раз эту функцию здесь, так как в MainLauncher не работало
+        GameInstalled.on_installation_complete() # на этой строчке зависает
     else:
         ConsoleMessage.Send("Can't find forge version for Minecraft")
     
@@ -87,15 +112,7 @@ def install_in_background():
 
 
 # Скачивание модов и конфига
-def cloudDownload (): # ЭТА КЭЭМЕЛ КЕЙС
-    options = { 'webdav_hostname' : secret.davlink,
-                'webdav_login' : secret.davlogin,
-                'webdav_password' : secret.davpass,
-                'disable_check': True } #иначе ломается
-    client = Client(options)
-    client.download_file("minecraft/options.txt", os.path.join(minecraft_path, "options.txt"))
-    client.download("minecraft/config", os.path.join(minecraft_path, "config"))
-    client.download("minecraft/mods", os.path.join(minecraft_path, "mods"))
+
 
 class GameInstalled(QObject):
     installed_signal = pyqtSignal()
@@ -127,4 +144,4 @@ ConsoleMessage.Send(f"Installing path: {minecraft_path}")
 
 # Проверяем, установлена ли игра при запуске лаунчера
 check_game_installed()
-check_configfile()
+check_configfile() # есть ли конфиг

@@ -2,8 +2,8 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="-10 0 2068 2048">
   <g transform="matrix(1 0 0 -1 0 1638)">
-   <path fill="#f2b036"
-d="M256 -282q-106 0 -181 75t-75 181v1280q0 106 75 181t181 75h512q60 0 114.5 -27.5t90.5 -75.5l77 -102q38 -51 102 -51h640q106 0 181 -75t75 -181v-1024q0 -106 -75 -181t-181 -75h-1536z" />
+   <path fill="000000"
+d="M256 -282q-106 0 -181 75t-75 181v1280q0 106 75 181t181 75h512q60 0 114.5 -27.5t90.5 -75.5l77 -102q38 -51 102 -51h640q106 0 181 -75t75 -181v-1024q0 -106 -75 -181t-181 -75h-1536z"/>
   </g>
 
 </svg>

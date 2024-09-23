@@ -1,3 +1,4 @@
+import os
 from PyQt5 import QtWidgets, QtCore
 import re
 
@@ -37,6 +38,8 @@ class IconManager:
 
     def SVGIcon(self, iconname):
         return (self.ColorizeIcon(iconname, Theme.IconColor))
+
+
     
 class Theme(QtWidgets.QMainWindow):
     IconColor = '#444444' #declare default color
@@ -47,14 +50,18 @@ class Theme(QtWidgets.QMainWindow):
 
     def AoHClassic(self):
         Theme.IconColor = '#b17dff'
-        file = QtCore.QFile("cache/stylesheets/AoHClassic.css")
+        themepath = os.path.join('cache', 'stylesheets', 'AoHClassic.css')
+        print(themepath)
+        file = QtCore.QFile(themepath)
         if file.open(QtCore.QFile.OpenModeFlag.ReadOnly):
             stream = QtCore.QTextStream(file)
             self.setStyleSheet(stream.readAll())
         
     def Classic92(self):
         Theme.IconColor = '#f2b036'
-        file = QtCore.QFile("cache/stylesheets/Classic92.css")
+        themepath = os.path.join('cache', 'stylesheets', 'Classic92.css')
+        print(themepath)
+        file = QtCore.QFile(themepath)
         if file.open(QtCore.QIODevice.OpenModeFlag.ReadOnly):
             stream = QtCore.QTextStream(file)
             self.setStyleSheet(stream.readAll())

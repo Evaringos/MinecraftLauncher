@@ -1,52 +1,88 @@
-QMainWindow {
-    background-color: #191919;
-    border: 1px solid #000000;  /*Новая обводка, не знаю как ее сделать чуть ниже сверху и стоит ли сделать оранжевой?*/              
+QWidget {
+    border: 1px solid  #f2b036;
+    background: #191919;
+    border-radius: 8px;
+}
+QWidget#Stretch {
+    border: none;
+    background: none;
 }
 QMenu { /*Dropdown menu*/
     background-color: #191919;
-    border: 1px solid #f2b036;                           
+    border: 1px solid #f2b036;
+    /* min-width:  0px; */
+    /* max-width:  0px; */
+    /* min-height: 0px; */
+    /* max-height: 0px; */
     color: #f2b036;
+    padding: 2px;
+}
+QMenu::item:selected {
+    background-color: #402701;
+    border-radius: 6px;
+    padding: 1px;
 }
 QToolBar {
     border: none;
+    margin: 2px;
+    padding: 2px;
     background: qlineargradient(x1:0, y1:0, x2:1, y2:1, 
-				stop:0 #333333, stop:1 #000000);
+				stop:0 #202020, stop:1 #3d2a02);
 }
 QLineEdit { /* Username input area */
     border-radius: 5px;
-    border: 1px solid #080808;
-    background-color: #191919;
-    padding: 2px;
+    border: 1px solid #f2b036;
+    background-color: #291901;
+    padding: 4px;
+    margin-left: 14px;
+    margin-right: 14px;    
     font-family: 'Consolas', monospace;
-    /* font-size: 14px; */
+    font-size: 16px;
     color: #f2b036;
 }
 QListView { /* Console box*/
     border-radius: 5px;
-    border: 1px solid #080808;
-    background-color: #1C1C1C;
+    padding: 4px;
+    margin-left: 14px;
+    margin-right: 14px;    
+    border: 1px solid #f2b036;
+    background-color: #291901;
     color: #f2b036;        
+}
+QPushButton[iconprop] { /*если иконка тулбара*/
+    min-height: 26px;
+    min-width: 26px;
+    max-width: 26px;
+    max-width: 26;
+    padding: 0px;
+    margin: 0px;
 }
 /*Play Button*/
 QPushButton {
     border-radius: 5px;
-    border: 1px solid #080808;
+    border: 2px solid #f2b036; 
     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-				      stop: 0 #1C1C1C, stop: 1 #151515);
-    padding: 2px;
+				      stop: 0 #1C1C1C, stop: 1 #402701);
+    padding: 0px;
+    min-height: 40px;
+    max-height: 40px;
+    margin: 14px;    
     font-family: 'Consolas', monospace;
-    font-size: 18px;
+    font-size: 24px;
     font-weight: bold;
     color: #f2b036;
 }
+QPushButton[iconprop]:disabled { color: #f2b036; } /* Иначе цвет становится серым */
+QPushButton:!hover { color: #f2b036; } /* Иначе цвет становится серым */
 QPushButton:hover {
     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-				      stop: 0 #2B2B2B, stop: 1 #333333);
-    border: 1px solid #323232;
+				      stop: 0 #915801, stop: 1 #9e6906);
+    /* background-color: #915801; */
+    border: 0px;
 }
 QPushButton:pressed {
     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-				      stop: 0 #333333, stop: 1 #2B2B2B);
+				      stop: 0 #291901, stop: 1 #402701);
     border: 1px solid #646464;
 }
 QProgressBar {
@@ -80,6 +116,8 @@ QListWidget::item:focus {
     border: none;  /* Убирает границу фокуса для отдельных элементов */
 }
 QLabel#image_label {
+    background: none;
+    border: none;    
     qproperty-pixmap: url("cache/Launcher_logo.png");
     qproperty-scaledContents: true;
 }
