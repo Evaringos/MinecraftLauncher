@@ -124,3 +124,30 @@ QLabel#image_label {
 QMenu::item:selected {
     background-color: #292828;
 }
+
+QScrollBar:vertical {
+    border: 1px solid #f2b036;
+    background: #f2b036;
+    margin: 2px 0 2px 0;
+    border-radius: 3px;
+}
+QScrollBar::sub-page:vertical, QScrollBar::add-page:vertical {
+    background: #402701;
+    border: 3px;
+      
+}
+QScrollBar::handle:vertical { /*сам ползунок */
+    background: #f2b036; 
+    min-height: 20px;
+    border-radius: 3px;
+}
+ QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+     border: 1px solid #f2b036;
+     height: 0px;
+     margin: 0px;
+     padding: 0px;
+     border-radius: 3px;
+     background: none;
+     position: disabled;
+ }
+ 
