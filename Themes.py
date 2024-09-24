@@ -17,6 +17,8 @@ class IconManager:
             'reload': 'cache/icons/reload.svg',
             'info': 'cache/icons/info.svg',
             'bin': 'cache/icons/bin.svg',
+            'discord': 'cache/icons/discord.svg',
+            'memory': 'cache/icons/memory.svg',
         }
 
     def ColorizeIcon(self, iconname: str, color: str):

@@ -3,12 +3,9 @@ import os
 import subprocess
 import threading
 import minecraft_launcher_lib
-import ConfigHandler
 from PyQt5.QtCore import QObject, pyqtSignal
 from webdav3.client import Client
-
-
-
+import ConfigHandler
 # Переменная для проверки установки игры
 is_game_installed = False
 
@@ -20,6 +17,8 @@ launcher_path = os.path.expanduser('~/AppData/Roaming/.AoHLauncher')
 minecraft_path = os.path.join(launcher_path, 'AoHMinecraft')
 aoh_config_file = os.path.join(launcher_path, "AoHConfig.ini")
 folder_version = os.path.join(minecraft_path, "versions")
+
+config = ConfigHandler.read_config()
 
 # Переменная для хранения версии Forge
 forge_version_name = None
@@ -71,9 +70,9 @@ def CloudDownload():
     from CloudDownload import CloudDownload
     CloudDownload("aohminecraft.zip", launcher_path, minecraft_path)
     end = time.time()
-    ConsoleMessage.Send(f"AoH is downloaded and extracted in {round(end - start)} s!")
+    ConsoleMessage.Send(f"AoH patch is downloaded and extracted in {round(end - start)} s!")
     
-    
+current_max = 100
 
 # Функция для установки игры
 def install_game():
@@ -90,8 +89,25 @@ def install_game():
 # Функция для выполнения установки в фоновом режиме
 def install_in_background():
     global forge_version_name
-    # Установка базовой версии Minecraft
-    minecraft_launcher_lib.install.install_minecraft_version(base_version, minecraft_path)
+    # Installation callback functions
+    def set_status(status: str):
+        print(status)
+
+    def set_progress(progress: int): 
+        print(f"Progress: {int(progress * 100)}%")  # Print progress as an integer
+
+    def set_max(new_max: int):
+        global current_max
+        current_max = new_max
+
+    callback = {
+        "setStatus": set_status,
+        "setProgress": set_progress,
+        "setMax": set_max,
+    }
+
+    # Install the base Minecraft version
+    minecraft_launcher_lib.install.install_minecraft_version(base_version, minecraft_path, callback=callback)
     
     # Поиск и установка последней доступной версии Forge для указанной версии Minecraft
     forge_version = minecraft_launcher_lib.forge.find_forge_version(base_version)
@@ -119,11 +135,17 @@ def install_in_background():
 def launch_game(username):
     # check_game_installed() # Temp line
     if is_game_installed and forge_version_name:
+        config = ConfigHandler.read_config()
         if username:
+            options = {
+                "username": username,
+                "jvmArguments": [f"-Xmx{config["Launcher"]["ram"]}G","-Xms3G"],
+            }
             ConsoleMessage.Send(f"Launching game with username: {username}")
             # Используем версию Forge для запуска
             command = minecraft_launcher_lib.command.get_minecraft_command\
-                (forge_version_name, minecraft_path, {"username": username})
+                            (forge_version_name, minecraft_path, options)
+                # (forge_version_name, minecraft_path, {"username": username} )
             CREATE_NO_WINDOW = 0x08000000
             subprocess.call(command, creationflags=CREATE_NO_WINDOW)
         else:

@@ -5,7 +5,8 @@ def create_default_config():
     config = configparser.ConfigParser()
     config['Launcher'] = {
         'username': '',
-        'theme': 'AoHClassic'
+        'theme': 'AoHClassic',
+        'ram': '4'
     }
     with open(GameLauncher.aoh_config_file, 'w') as configfile:
         config.write(configfile)

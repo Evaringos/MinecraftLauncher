@@ -2,3 +2,4 @@ PyQt5
 pyinstaller
 webdavclient3
 minecraft_launcher_lib
+wget
