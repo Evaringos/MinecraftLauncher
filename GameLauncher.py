@@ -34,15 +34,25 @@ class GameInstalledClass(QObject):
     
     def signalis(self):
         self.installed_signal.emit()
+
+class ModsRefreshedClass(QObject):
+    refresh_signal = pyqtSignal()
+
+    def signalis(self):
+        self.refresh_signal.emit()
         
 ConsoleMessage = ConsoleMessageClass() # создаю экземпляр чтобы можно было потом выгрузить его в Main
 GameInstalled = GameInstalledClass()
+ModsRefreshed = ModsRefreshedClass()
 
 def GetConsoleMessage():
     return ConsoleMessage
 
 def GetGameInstalled():
     return GameInstalled
+
+def GetModsRefreshed():
+    return ModsRefreshed
 
 # Функция для проверки установки игры при запуске
 def check_game_installed():
@@ -66,11 +76,13 @@ def check_configfile():
 
 # download zip with minecraft patches.
 def CloudDownload():
+    ConsoleMessage.Send("Refreshing mods has been started!")
     start = time.time()
     from CloudDownload import CloudDownload
     CloudDownload("aohminecraft.zip", launcher_path, minecraft_path)
     end = time.time()
     ConsoleMessage.Send(f"AoH patch is downloaded and extracted in {round(end - start)} s!")
+    ModsRefreshed.signalis()
     
 current_max = 100
 

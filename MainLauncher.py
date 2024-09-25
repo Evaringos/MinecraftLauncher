@@ -1,5 +1,6 @@
 import sys, os
 import GameLauncher
+import threading
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QGraphicsOpacityEffect
 from PyQt5.QtGui import QColor, QIcon, QDesktopServices, QPainter, QPalette, QPixmap
@@ -63,8 +64,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         update_config("Launcher", "ram", ram)
     
     def LanguageChanged(self, language=None):
-        self.Console.addItem("There's no others languages yet!")
-        print("There's no others languages yet!")
+        if language :
+            update_config("Launcher", "language", language)
+        # self.Console.addItem("There's no others languages yet!")
+        # print("There's no others languages yet!")
 
     # Button handler
     def PlayButtonPressed(self):
@@ -84,6 +87,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.Console.addItem("Play session has been ended!")
         else:
             self.Console.addItem("Unknown command!")
+    
+    def RefreshClicked(self):
+        self.InstallingProcess()
+        self.progressBar.setVisible(True)
+        self.Refresh.setEnabled(False)
+        self.SettingsButton.setEnabled(False)
+        self.PlayButton.setEnabled(False)
+        CloudThread = threading.Thread(target=GameLauncher.CloudDownload)
+        CloudThread.start()
 
     # Button statement update
     def ButtonTextChange(self): 
@@ -130,8 +142,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.settings = QtCore.QSettings("AoH Launcher", "Settings")
         self.game_installed = GameLauncher.GetGameInstalled()  # Создаем экземпляр класса GameInstalled
+        self.mods_refreshed = GameLauncher.GetModsRefreshed()
         self.game_installed.installed_signal.connect(self.GameInstallingDone)
         self.game_installed.installed_signal.connect(self.InstallationComplete)
+        self.mods_refreshed.refresh_signal.connect(self.GameInstallingDone)
+        self.mods_refreshed.refresh_signal.connect(self.InstallationComplete)
 
         app.setWindowIcon(QtGui.QIcon('cache/aoh_icon.ico'))
         self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint) # отключение рамки окна
@@ -241,15 +256,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.language_option1.setCheckable(True)
         self.language_option2.setCheckable(True)
-        self.language_option1.setChecked(True)
+        if config["Launcher"]["language"] == "eng": self.language_option1.setChecked(True)
+        elif config["Launcher"]["language"] == "rus": self.language_option2.setChecked(True)
         
         # Подключаем слоты для действий. triggered - действие только когда галка ставится
         self.theme_option1.triggered.connect(lambda: self.update_theme("AoHClassic"))
         self.theme_option2.triggered.connect(lambda: self.update_theme("Console92"))
         self.theme_option3.triggered.connect(lambda: self.update_theme("GruvBox"))
         self.theme_option4.triggered.connect(lambda: self.update_theme("Green Hill"))
-        self.language_option1.toggled.connect(lambda: self.LanguageChanged())
-        self.language_option2.toggled.connect(lambda: self.LanguageChanged())
+        self.language_option1.toggled.connect(lambda: self.LanguageChanged("eng"))
+        self.language_option2.toggled.connect(lambda: self.LanguageChanged("rus"))
         self.RamOption1.toggled.connect(lambda: self.RamChanged("2"))
         self.RamOption2.toggled.connect(lambda: self.RamChanged("4"))
         self.RamOption3.toggled.connect(lambda: self.RamChanged("8"))
@@ -303,7 +319,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.toolbar.addWidget(self.Refresh)
 
         # def refresh_mods():
-        self.Refresh.clicked.connect(GameLauncher.CloudDownload)
+        self.Refresh.clicked.connect(self.RefreshClicked)
 
         # Stretch
         self.Stretch = QtWidgets.QWidget()
