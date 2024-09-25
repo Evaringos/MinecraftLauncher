@@ -47,22 +47,42 @@ class Theme(QtWidgets.QMainWindow):
     IconColor = '#444444' #declare default color
     Icon = IconManager()
     def SetTheme(self, theme):
-        if theme == "Classic92": Theme.Classic92(self)
+        if theme == "Console92": Theme.Console92(self)
         elif theme == "AoHClassic": Theme.AoHClassic(self)
+        elif theme == "GruvBox": Theme.GruvBox(self)
+        elif theme == "Green Hill": Theme.GreenHill(self)
 
     def AoHClassic(self):
         Theme.IconColor = '#b17dff'
         themepath = os.path.join('cache', 'stylesheets', 'AoHClassic.css')
-        print(themepath)
+        # print(themepath)
         file = QtCore.QFile(themepath)
         if file.open(QtCore.QFile.OpenModeFlag.ReadOnly):
             stream = QtCore.QTextStream(file)
             self.setStyleSheet(stream.readAll())
         
-    def Classic92(self):
+    def Console92(self):
         Theme.IconColor = '#f2b036'
-        themepath = os.path.join('cache', 'stylesheets', 'Classic92.css')
-        print(themepath)
+        themepath = os.path.join('cache', 'stylesheets', 'Console92.css')
+        # print(themepath)
+        file = QtCore.QFile(themepath)
+        if file.open(QtCore.QIODevice.OpenModeFlag.ReadOnly):
+            stream = QtCore.QTextStream(file)
+            self.setStyleSheet(stream.readAll())
+
+    def GruvBox(self):
+        Theme.IconColor = '#f22036'
+        themepath = os.path.join('cache', 'stylesheets', 'GruvBox.css')
+        # print(themepath)
+        file = QtCore.QFile(themepath)
+        if file.open(QtCore.QIODevice.OpenModeFlag.ReadOnly):
+            stream = QtCore.QTextStream(file)
+            self.setStyleSheet(stream.readAll())
+
+    def GreenHill(self):
+        Theme.IconColor = '#00ff00'
+        themepath = os.path.join('cache', 'stylesheets', 'GreenHill.css')
+        # print(themepath)
         file = QtCore.QFile(themepath)
         if file.open(QtCore.QIODevice.OpenModeFlag.ReadOnly):
             stream = QtCore.QTextStream(file)

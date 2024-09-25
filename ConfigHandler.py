@@ -6,7 +6,8 @@ def create_default_config():
     config['Launcher'] = {
         'username': '',
         'theme': 'AoHClassic',
-        'ram': '4'
+        'ram': '8',
+        'language': 'eng'
     }
     with open(GameLauncher.aoh_config_file, 'w') as configfile:
         config.write(configfile)

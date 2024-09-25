@@ -62,7 +62,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def RamChanged(self, ram):
         update_config("Launcher", "ram", ram)
     
-    # def LanguageChanged(self, Language=None):
+    def LanguageChanged(self, language=None):
+        self.Console.addItem("There's no others languages yet!")
+        print("There's no others languages yet!")
 
     # Button handler
     def PlayButtonPressed(self):
@@ -191,14 +193,22 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # Создаем действия для меню
         self.theme_option1 = self.theme_menu_group.addAction("AoH Classic")
         self.theme_option2 = self.theme_menu_group.addAction("Console92")
+        self.theme_option3 = self.theme_menu_group.addAction("GruvBox")
+        self.theme_option4 = self.theme_menu_group.addAction("Green Hill")
 
         self.theme_menu.addAction(self.theme_option1)
-        self.theme_menu.addAction(self.theme_option2)        
+        self.theme_menu.addAction(self.theme_option2)   
+        self.theme_menu.addAction(self.theme_option3)
+        self.theme_menu.addAction(self.theme_option4)     
 
         self.theme_option1.setCheckable(True)
         self.theme_option2.setCheckable(True)
+        self.theme_option3.setCheckable(True)
+        self.theme_option4.setCheckable(True)
         if config["Launcher"]["Theme"] == "AoHClassic": self.theme_option1.setChecked(True) #Галочка по дефолту
-        else: self.theme_option2.setChecked(True)
+        elif config["Launcher"]["Theme"] == "Console92": self.theme_option2.setChecked(True)
+        elif config["Launcher"]["Theme"] == "GruvBox": self.theme_option3.setChecked(True)
+        elif config["Launcher"]["Theme"] == "Green Hill": self.theme_option4.setChecked(True)
 
         self.RamOption1 = self.ram_menu_group.addAction("2 Gb")
         self.RamOption2 = self.ram_menu_group.addAction("4 Gb")
@@ -217,9 +227,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.RamOption3.setCheckable(True)
         self.RamOption4.setCheckable(True)
         self.RamOption5.setCheckable(True)
-        if config["Launcher"]["ram"] == "4": self.RamOption2.setChecked(True)
+        if config["Launcher"]["ram"] == "8": self.RamOption3.setChecked(True)
         elif config["Launcher"]["ram"] == "2": self.RamOption1.setChecked(True)
-        elif config["Launcher"]["ram"] == "8": self.RamOption3.setChecked(True)
+        elif config["Launcher"]["ram"] == "4": self.RamOption2.setChecked(True)
         elif config["Launcher"]["ram"] == "12": self.RamOption4.setChecked(True)
         elif config["Launcher"]["ram"] == "18": self.RamOption5.setChecked(True)
 
@@ -231,12 +241,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.language_option1.setCheckable(True)
         self.language_option2.setCheckable(True)
+        self.language_option1.setChecked(True)
         
         # Подключаем слоты для действий. triggered - действие только когда галка ставится
         self.theme_option1.triggered.connect(lambda: self.update_theme("AoHClassic"))
-        self.theme_option2.triggered.connect(lambda: self.update_theme("Classic92"))
-        self.language_option1.toggled.connect(lambda: self.LanguageChanged(self.language_option1))
-        self.language_option2.toggled.connect(lambda: self.LanguageChanged(self.language_option2))
+        self.theme_option2.triggered.connect(lambda: self.update_theme("Console92"))
+        self.theme_option3.triggered.connect(lambda: self.update_theme("GruvBox"))
+        self.theme_option4.triggered.connect(lambda: self.update_theme("Green Hill"))
+        self.language_option1.toggled.connect(lambda: self.LanguageChanged())
+        self.language_option2.toggled.connect(lambda: self.LanguageChanged())
         self.RamOption1.toggled.connect(lambda: self.RamChanged("2"))
         self.RamOption2.toggled.connect(lambda: self.RamChanged("4"))
         self.RamOption3.toggled.connect(lambda: self.RamChanged("8"))
