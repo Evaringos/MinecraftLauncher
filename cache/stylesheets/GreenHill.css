@@ -118,7 +118,7 @@ QListWidget::item:focus {
 QLabel#image_label {
     background: none;
     border: none;    
-    qproperty-pixmap: url("cache/Launcher_logo.png");
+    qproperty-pixmap: url("cache/Launcher_logo_green.png");
     qproperty-scaledContents: true;
 }
 QMenu::item:selected {
