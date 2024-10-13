@@ -2,10 +2,12 @@ import time
 import os
 import subprocess
 import threading
+from shutil import rmtree
 import minecraft_launcher_lib
-from PyQt5.QtCore import QObject, pyqtSignal
-from webdav3.client import Client
+from PySide6.QtCore import QObject, Signal
 import ConfigHandler
+from Signals import signals
+
 # Переменная для проверки установки игры
 is_game_installed = False
 
@@ -17,42 +19,33 @@ launcher_path = os.path.expanduser('~/AppData/Roaming/.AoHLauncher')
 minecraft_path = os.path.join(launcher_path, 'AoHMinecraft')
 aoh_config_file = os.path.join(launcher_path, "AoHConfig.ini")
 folder_version = os.path.join(minecraft_path, "versions")
+telegram_link = "https://t.me/AspirationOfHolowave"
+
 
 config = ConfigHandler.read_config()
-
 # Переменная для хранения версии Forge
 forge_version_name = None
 
-class ConsoleMessageClass(QObject):
-    message_signal = pyqtSignal(str)
-    
-    def Send (self, message):
-        self.message_signal.emit(message)
+def DestroyIt():
+    signals.console_message.emit("Start the process of deleting minecraft...")
+    if os.path.exists(launcher_path):
+        if os.path.exists(minecraft_path):
+            rmtree(minecraft_path)  # Используем shutil.rmtree для удаления папки рекурсивно
+            signals.console_message.emit("Hi from gamelauncher.py!")
+            return 1 # all good
+        else:
+            signals.console_message.emit("Hi from gamelauncher.py!")
+            return 0
+    else:
+        signals.console_message.emit(f"Folder {minecraft_path} isn't exists.")
+        signals.console_message.emit("Hi from gamelauncher.py!")
+        return 0 # failure
 
-class GameInstalledClass(QObject):
-    installed_signal = pyqtSignal()
-    
-    def signalis(self):
-        self.installed_signal.emit()
-
-class ModsRefreshedClass(QObject):
-    refresh_signal = pyqtSignal()
-
-    def signalis(self):
-        self.refresh_signal.emit()
-        
-ConsoleMessage = ConsoleMessageClass() # создаю экземпляр чтобы можно было потом выгрузить его в Main
-GameInstalled = GameInstalledClass()
-ModsRefreshed = ModsRefreshedClass()
-
-def GetConsoleMessage():
-    return ConsoleMessage
-
-def GetGameInstalled():
-    return GameInstalled
-
-def GetModsRefreshed():
-    return ModsRefreshed
+def PlayButtonTextHandler():
+    if os.path.exists(folder_version):
+        return 1 # ready to play
+    else:
+        return 0 # neccessary to install the game
 
 # Функция для проверки установки игры при запуске
 def check_game_installed():
@@ -65,6 +58,7 @@ def check_game_installed():
             if version["id"].startswith(base_version + "-forge"):
                 forge_version_name = version["id"]
                 break
+        signals.play_button_state_changed.emit(True, "Play")
 
 # Есть ли файл конфигурации
 def check_configfile():
@@ -76,13 +70,13 @@ def check_configfile():
 
 # download zip with minecraft patches.
 def CloudDownload():
-    ConsoleMessage.Send("Refreshing mods has been started!")
+    signals.console_message.emit("Refreshing mods has been started!")
     start = time.time()
     from CloudDownload import CloudDownload
     CloudDownload("aohminecraft.zip", launcher_path, minecraft_path)
     end = time.time()
-    ConsoleMessage.Send(f"AoH patch is downloaded and extracted in {round(end - start)} s!")
-    ModsRefreshed.signalis()
+    signals.console_message.emit(f"AoH patch is downloaded and extracted in {round(end - start)} s!")
+    signals.mods_refreshed.emit()
     
 current_max = 100
 
@@ -93,10 +87,10 @@ def install_game():
 #        on_installation_complete()
 #    else:
     install_thread = threading.Thread(target=install_in_background)
-    cloud_thread = threading.Thread(target=CloudDownload)
     install_thread.start()
+    cloud_thread = threading.Thread(target=CloudDownload)
     cloud_thread.start()
-    #        cloudDownload()
+
 
 # Функция для выполнения установки в фоновом режиме
 def install_in_background():
@@ -106,7 +100,7 @@ def install_in_background():
         print(status)
 
     def set_progress(progress: int): 
-        print(f"Progress: {int(progress * 100)}%")  # Print progress as an integer
+        print(f"Progress: {int(progress)}%")  # Print progress as an integer
 
     def set_max(new_max: int):
         global current_max
@@ -122,26 +116,21 @@ def install_in_background():
     minecraft_launcher_lib.install.install_minecraft_version(base_version, minecraft_path, callback=callback)
     
     # Поиск и установка последней доступной версии Forge для указанной версии Minecraft
-    forge_version = minecraft_launcher_lib.forge.find_forge_version(base_version)
+    # forge_version = minecraft_launcher_lib.forge.find_forge_version(base_version)
+    forge_version = "1.20.1-47.3.10"
     if forge_version:
         forge_version_name = minecraft_launcher_lib.forge.install_forge_version(forge_version, minecraft_path)
+        signals.console_message.emit("Forge has been installed")
         
-        ConsoleMessage.Send("Forge has been installed")
         # на этой строчке зависает
         global is_game_installed
         is_game_installed = True
+        signals.play_button_state_changed.emit(True, "Play")
         check_game_installed()
-        GameInstalled.signalis()
     else:
-        ConsoleMessage.Send("Can't find forge version for Minecraft")
-    
-    # root.after(0, on_installation_complete)
-    # root.after(0, on_installation_complete) # Строчка вызывает ошибку
-
-
+        signals.console_message.emit("Can't find forge version for Minecraft")
 
 # Скачивание модов и конфига
-
 
 # Кнопка запуска игры
 def launch_game(username):
@@ -151,20 +140,18 @@ def launch_game(username):
         if username:
             options = {
                 "username": username,
-                "jvmArguments": [f"-Xmx{config["Launcher"]["ram"]}G","-Xms3G"],
+                "jvmArguments": [f"-Xmx{config['Launcher']['ram']}G","-Xms3G"],
             }
-            ConsoleMessage.Send(f"Launching game with username: {username}")
+            signals.console_message.emit(f"Launching game with username: {username}")
             # Используем версию Forge для запуска
             command = minecraft_launcher_lib.command.get_minecraft_command\
-                            (forge_version_name, minecraft_path, options)
-                # (forge_version_name, minecraft_path, {"username": username} )
-            CREATE_NO_WINDOW = 0x08000000
-            subprocess.call(command, creationflags=CREATE_NO_WINDOW)
+                (forge_version_name, minecraft_path, options)
+            subprocess.call(command, creationflags=0x08000000) #CREATE_NO_WINDOW
         else:
-            ConsoleMessage.Send("Can't launch the game without username!")
+            signals.console_message.emit("Can't launch the game without username!")
 
 
-ConsoleMessage.Send(f"Installing path: {minecraft_path}")
+signals.console_message.emit(f"Installing path: {minecraft_path}")
 
 # Проверяем, установлена ли игра при запуске лаунчера
 check_game_installed()

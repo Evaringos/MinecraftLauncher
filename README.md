@@ -15,9 +15,10 @@ This project is dedicated to creating a Minecraft launcher based on Python. Our 
 To use our launcher, you need to download and install the following libraries:
 
 - Minecraft_launcher_lib
-- PyQt5
+- PySide6
 - pyinstaller
-- webdavclient3 (temporarily?)
+- wget
+- pywin 32
 
 ## Usage
 
@@ -50,4 +51,4 @@ We would like to thank the following individuals and organizations for their con
 
 - [Mojang](https://www.minecraft.net/) for creating Minecraft
 - [Python Software Foundation](https://www.python.org/) for creating Python
-- [PyQt](https://www.riverbankcomputing.com/software/pyqt/) for creating PyQt
+- [Qt Group](https://www.qt.io/qt-for-python) for creating PySide6
