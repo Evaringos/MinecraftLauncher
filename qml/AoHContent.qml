@@ -60,7 +60,7 @@ ColumnLayout {
             border.color: Theme.accentColBright
             color: Theme.accentBgSemi
             height: parent.height
-            width: 215
+            width: 390 // 215
             TextInput {
                 id: textField
                 width: parent.width
@@ -90,10 +90,10 @@ ColumnLayout {
             //bordercolor: Theme.accentColBright
             //color: Theme.accentBgSemi
             height: parent.height
-            width: 215
+            width: 40 // 215
             bgOpacity: 0.5
             iconSource: "../cache/icons/account.svg"
-            title: qsTr("Account")
+            // title: qsTr("Account")
         }
     }
 
