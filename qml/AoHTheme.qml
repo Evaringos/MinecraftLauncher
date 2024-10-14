@@ -34,7 +34,7 @@ QtObject { // blue theme
     // Menu properies
     property int menuHoveredPad: (Theme.borderWidth * 2)
     property int menuArrowSize: Theme.buttonIconSize / 2
-
+    property int menuWidth: 100
 
     function toggleTheme() {
         themeName = themeName === "light" ? "dark" : "light"

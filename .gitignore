@@ -13,4 +13,6 @@ secret.py
 AoHLauncher.exe
 .venv
 .vs
+*qmlproject*
+.qtcreator
 

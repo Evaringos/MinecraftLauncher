@@ -6,8 +6,8 @@ import QtQuick.Controls
 ApplicationWindow {
     id: mainWindow
     title: "AoH Launcher"
-    width: 500
-    height: 600
+    width: 510
+    height: 610
     flags: Qt.FramelessWindowHint | Qt.Window
     color: "transparent"
     visible: false

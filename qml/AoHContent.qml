@@ -63,18 +63,20 @@ ColumnLayout {
             width: 215
             TextInput {
                 id: textField
-                //anchors.fill: parent
-                //leftPadding: 8
-                width: textRect.width
+                width: parent.width
+                anchors.left: parent.left
+                leftPadding: 8
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: 22
+                maximumLength: 16
                 font.family: "Consolas"
                 color: Theme.accentColBright
-
+                text: username ? username.username_text : "Steve"
+                onTextChanged: username ? username.set_username(text) : ""
                 Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.left: parent.left
                     font: parent.font
+                    leftPadding: parent.leftPadding
                     color: Theme.accentColSemi
                     text: "Username"
                     visible: !parent.text
@@ -98,7 +100,8 @@ ColumnLayout {
     AoHButton { // Play button
         id: playButtonObj
         //rectBGColor: Theme.accentBgSemi
-        title: playButton.playButtonText
+        title: playButton ? playButton.play_button_text : "Loading"
+        enabled: playButton ? playButton.button_enabled : false
         textSize: 20
         borderwidth: 2
         bgOpacity: 0.5

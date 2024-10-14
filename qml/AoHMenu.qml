@@ -11,6 +11,7 @@ Menu {
     x: parent.x - 2
     y: parent.y + parent.height - 2
     overlap: 0
+    width: Theme.menuWidth
 
     onClosed: {
         parent.checked = !parent.checked
@@ -19,7 +20,7 @@ Menu {
 
     delegate: MenuItem {
         id:menuItem
-        implicitWidth: 240
+        implicitWidth: root.width
         implicitHeight: 20
 
         arrow: Rectangle {
@@ -129,7 +130,7 @@ Menu {
 
     background: Rectangle {
         id: menubgrect
-        implicitWidth: 120
+        // implicitWidth: 120
         implicitHeight: 20
         color: Theme.accentCol
         border.color: Theme.accentColBright

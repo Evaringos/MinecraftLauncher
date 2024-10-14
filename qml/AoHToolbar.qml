@@ -76,12 +76,12 @@ Rectangle {
                 Action {
                     text: "Credits"
                     icon.source: "../cache/icons/info.svg"
-                    onTriggered: bridge.credits()
+                    onTriggered: toolbarButtonHandler.credits()
                 }
                 Action {
                     text: "Delete Minecraft"
                     icon.source: "../cache/icons/bin.svg"
-                    onTriggered: bridge.deleteMinecraft()
+                    onTriggered: toolbarButtonHandler.deleteMinecraft()
                 }
             }
         }
@@ -90,7 +90,7 @@ Rectangle {
 
         AoHButton {
             iconSource: "../cache/icons/folder.svg"
-            onClicked: bridge.open_folder()
+            onClicked: toolbarButtonHandler.open_folder()
             borderwidth: 0
         }
 
@@ -98,7 +98,7 @@ Rectangle {
 
         AoHButton {
             iconSource: "../cache/icons/telegram.svg"
-            onClicked: bridge.openTelegram()
+            onClicked: toolbarButtonHandler.openTelegram()
             borderwidth: 0}
 
         AoHToolBarSeparator {}
@@ -130,7 +130,7 @@ Rectangle {
             Layout.rightMargin: Theme.borderWidth
             icon.color: iconcolor
             iconSource: "../cache/icons/close2.svg"
-            onClicked: mainWindow.close()
+            onClicked: bridge.aboutToClose(mainWindow)
         }
     }
 }

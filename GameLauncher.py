@@ -4,7 +4,7 @@ import subprocess
 import threading
 from shutil import rmtree
 import minecraft_launcher_lib
-from PySide6.QtCore import QObject, Signal
+from PySide6.QtCore import QObject, Signal, Slot
 import ConfigHandler
 from Signals import signals
 
@@ -15,10 +15,10 @@ is_game_installed = False
 base_version = "1.20.1"
 
 # Путь установки игры, модов, конфигов
-launcher_path = os.path.expanduser('~/AppData/Roaming/.AoHLauncher')
+launcher_path = os.path.expanduser('~\\AppData\\Roaming\\.AoHLauncher')
 minecraft_path = os.path.join(launcher_path, 'AoHMinecraft')
 aoh_config_file = os.path.join(launcher_path, "AoHConfig.ini")
-folder_version = os.path.join(minecraft_path, "versions")
+version_folder = os.path.join(minecraft_path, "versions")
 telegram_link = "https://t.me/AspirationOfHolowave"
 
 
@@ -26,39 +26,45 @@ config = ConfigHandler.read_config()
 # Переменная для хранения версии Forge
 forge_version_name = None
 
-def DestroyIt():
+def DeleteMinecraft():
     signals.console_message.emit("Start the process of deleting minecraft...")
     if os.path.exists(launcher_path):
         if os.path.exists(minecraft_path):
             rmtree(minecraft_path)  # Используем shutil.rmtree для удаления папки рекурсивно
-            signals.console_message.emit("Hi from gamelauncher.py!")
-            return 1 # all good
+            signals.console_message.emit("The game succesfully deleted")
         else:
-            signals.console_message.emit("Hi from gamelauncher.py!")
-            return 0
+            signals.console_message.emit("Game was already deleted")
     else:
-        signals.console_message.emit(f"Folder {minecraft_path} isn't exists.")
-        signals.console_message.emit("Hi from gamelauncher.py!")
-        return 0 # failure
-
-def PlayButtonTextHandler():
-    if os.path.exists(folder_version):
-        return 1 # ready to play
-    else:
-        return 0 # neccessary to install the game
+        signals.console_message.emit(f"Folder {launcher_path} isn't exists.")
 
 # Функция для проверки установки игры при запуске
 def check_game_installed():
     global is_game_installed, forge_version_name
-    if os.path.exists(folder_version):
+    if os.path.exists(version_folder):
         is_game_installed = True
         # Проверяем, установлена ли версия Forge
-        versions = minecraft_launcher_lib.utils.get_installed_versions(minecraft_path)
-        for version in versions:
-            if version["id"].startswith(base_version + "-forge"):
-                forge_version_name = version["id"]
-                break
-        signals.play_button_state_changed.emit(True, "Play")
+        # versions = minecraft_launcher_lib.utils.get_installed_versions(minecraft_path)
+        # for version in versions:
+            # if version["id"].startswith(base_version + "-forge"):
+                # forge_version_name = version["id"]
+                # break
+        signals.play_button_state_changed.emit(True)
+        signals.play_button_text_changed.emit("Play")
+    else: signals.play_button_text_changed.emit("Install game")
+
+class Username():
+    def __init__(self):
+        signals.username_changed.connect(self.usernameToConfig)
+    
+    @staticmethod
+    def usernameFromConfig():
+        signals.username_changed.emit(config["Launcher"]["username"])
+
+    @Slot(str)
+    def usernameToConfig(username):
+        ConfigHandler.update_config("Launcher", "username", username)
+    
+
 
 # Есть ли файл конфигурации
 def check_configfile():
@@ -125,7 +131,8 @@ def install_in_background():
         # на этой строчке зависает
         global is_game_installed
         is_game_installed = True
-        signals.play_button_state_changed.emit(True, "Play")
+        signals.play_button_state_changed.emit(True)
+        signals.play_button_text_changed.emit("Play")
         check_game_installed()
     else:
         signals.console_message.emit("Can't find forge version for Minecraft")

@@ -15,21 +15,21 @@ Rectangle {
     id: root
     //anchors.fill: parent
     anchors.centerIn: parent
-    width: parent.width
-    height: parent.height
+    width: parent.width - 10
+    height: parent.height - 10
     color: "transparent"
     AoHToolbar { id: aohToolbar }
 
     Rectangle { id: rootbg; anchors.fill: root; radius: borderradius; color: "black"}
 
-    // DropShadow {
-    //     anchors.fill: root
-    //     spread: 0.3
-    //     radius: 9
-    //     cached: true
-    //     samples: 15
-    //     source: rootbg
-    //     color: "#80000000"}
+    DropShadow {
+        anchors.fill: root
+        spread: 0.3
+        radius: 10
+        cached: true
+        samples: 20
+        source: rootbg
+        color: "#60000000"}
 
 
     MediaPlayer {

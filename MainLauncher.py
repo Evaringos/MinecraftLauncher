@@ -1,17 +1,19 @@
 import sys, os, threading
-from ctypes import byref, WinDLL
-from ctypes.wintypes import RECT, MSG
-import win32con, win32gui
+from ctypes import WinDLL
+from ctypes.wintypes import MSG
+import win32con, win32gui, win32api
 from PySide6.QtWidgets import QApplication
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtGui import QIcon, QDesktopServices
-from PySide6.QtCore import Qt, QAbstractListModel, QAbstractNativeEventFilter, QByteArray, QModelIndex, QUrl, QObject, Slot, Signal, Property
-import GameLauncher
+from PySide6.QtCore import Qt, QAbstractListModel, QAbstractNativeEventFilter, QByteArray
+from PySide6.QtCore import QModelIndex, QUrl, QObject, Slot, Signal, Property
 from Signals import signals
-        
+import GameLauncher
+
 
 dwmapi = WinDLL("dwmapi.dll")
 user32 = WinDLL("user32.dll")
+
 
 class WinEventFilter(QAbstractNativeEventFilter):
     def nativeEventFilter(self, eventType, message):
@@ -42,64 +44,90 @@ class ConsoleModel(QAbstractListModel):
     def roleNames(self):
         return {ConsoleModel.TextRole: b'text'}
 
-    @Slot(str)
     def appendText(self, text):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         self._texts.append(text)
         self.endInsertRows()
 
-class PlayButtonTextBridge(QObject):
-    PlayButtonState = Signal()
-    PlayButtonText = Signal()
-    
+class PlayButtonBridge(QObject):
+    play_button_text_changed = Signal(str)
+    button_enabled_chanded = Signal(bool)
     def __init__(self):
         super().__init__()
         self._play_button_text = "Error"
         self._button_enabled = True
-        signals.play_button_state_changed.connect(self.update_button_state)
+        signals.play_button_state_changed.connect(self.set_button_enabled)
+        signals.play_button_text_changed.connect(self.set_play_button_text)
+        GameLauncher.check_game_installed()
 
-    @Property(str, notify=signals.play_button_state_changed)
-    def play_button_text(self):
+    def get_play_button_text(self) -> str :
         return self._play_button_text
 
-    @Property(bool, notify=signals.play_button_state_changed)
-    def button_enabled(self):
+    def get_button_enabled(self) -> bool :
         return self._button_enabled
-       
-    @Slot(bool, str)
-    def update_button_state(self, enabled:bool, text:str):
-        self._button_enabled = enabled
-        self._play_button_text = text
-        signals.play_button_state_changed.emit(enabled, text)
+
+    
+    def set_play_button_text(self, text: str):
+        if self._play_button_text != text:
+            self._play_button_text = text
+            self.play_button_text_changed.emit(text)
+            # signals.play_button_text_changed.emit(text)
+
+    def set_button_enabled(self, enabled: bool):
+        if self._button_enabled != enabled:
+            self._button_enabled = enabled
+            self.button_enabled_chanded.emit(enabled)
+            # signals.play_button_state_changed.emit(enabled)
+
+    play_button_text = Property(str, get_play_button_text, set_play_button_text,
+                                notify=play_button_text_changed)
+    button_enabled = Property(bool, get_button_enabled, set_button_enabled,
+                              notify=button_enabled_chanded)
+
 
     @Slot()
     def play_pressed(self):
-        result = GameLauncher.PlayButtonTextHandler()
-        match result:
-            case 1: # ready to play
-                signals.console_message.emit("Starting to launch the game!")
-                signals.console_message.emit(f"game installed: {GameLauncher.is_game_installed}")
-                signals.console_message.emit(f"forge: {GameLauncher.forge_version_name}")
-                GameLauncher.launch_game("Stradlater")
-            case 0: # need in downloading the game
-                signals.console_message.emit("Starting downloading the game!")
-                signals.console_message.emit("Please don't close this window!")
-                signals.play_button_state_changed.emit(False, self._play_button_text)
-                GameLauncher.install_game()
+        if os.path.exists(GameLauncher.version_folder):
+            signals.console_message.emit("Starting to launch the game!")
+            signals.console_message.emit(f"game installed: {GameLauncher.is_game_installed}")
+            signals.console_message.emit(f"forge: {GameLauncher.forge_version_name}")
+            GameLauncher.launch_game("Stradlater")
+        else:
+            signals.console_message.emit("Starting downloading the game!")
+            signals.console_message.emit("Please don't close this window!")
+            signals.play_button_state_changed.emit(False) # dont chane title
+            signals.play_button_text_changed.emit("Installing")
+            GameLauncher.install_game()
+
+class UsernameInputHandler(QObject):
+    username_changed = Signal(str)
+    def __init__(self):
+        super().__init__()
+        self.username = "Steve"
+        signals.username_changed.connect(self.set_username)
+        GameLauncher.Username.usernameFromConfig()
         
 
-class Bridge(QObject):
+    def set_username(self, username:str):
+        if self.username != username:
+            self.username = username
+            GameLauncher.Username.usernameToConfig(username)
+            signals.username_changed.emit(username)
+
+    def get_username(self) -> str :
+        return self.username
+
+    username_text = Property(str, get_username, set_username,
+                             notify=username_changed)
+    
+    # @Slot(str)
+    # def inputUsername(self, username):
+        # self.username = username
+
+class ToolBarButtonHandler(QObject):
     @Slot()
     def deleteMinecraft(self):
-        result = GameLauncher.DestroyIt()
-        match result:
-            case 1:
-                signals.console_message.emit(f"Folder {GameLauncher.minecraft_path} has been sucess deleted.")
-            case 0:
-                signals.console_message.emit(f"Folder {GameLauncher.minecraft_path} isn't exists")
-            case _:
-                print("Невозможно")
-    
+        GameLauncher.DeleteMinecraft()        
     @Slot()	# on open game location pressed
     def open_folder(self):
         if (os.path.exists(GameLauncher.launcher_path) & os.path.exists(GameLauncher.minecraft_path)):
@@ -115,7 +143,6 @@ class Bridge(QObject):
     def openTelegram(self):
         QDesktopServices.openUrl(QUrl(GameLauncher.telegram_link))
         
-
     @Slot()
     def credits(self):
         signals.console_message.emit("---================---")
@@ -124,30 +151,55 @@ class Bridge(QObject):
         signals.console_message.emit("Designer / Community manager - Xeenomiya")
         signals.console_message.emit("---================---")
 
+        
+class Bridge(QObject):
     @Slot(QObject)
     def setFlags(self, window):
         self.window = window
         hwnd = int(self.window.winId())
         self.event_filter = WinEventFilter()
         QApplication.instance().installNativeEventFilter(self.event_filter)
-        win32gui.SetWindowLong(hwnd, -16,		# | 
+        win32gui.SetWindowLong(hwnd, win32con.GWL_STYLE,# | 
                        win32con.WS_POPUP		# ||
                        | win32con.WS_SYSMENU		# ||| setting style to restore show-hide animations
                        | win32con.WS_CAPTION		# ||
                        | win32con.WS_MINIMIZEBOX)	# |
-        margins = RECT(-1, -1, -1, -1)					# | setting shadow
-        dwmapi.DwmExtendFrameIntoClientArea(hwnd, byref(margins))	# |
+        style = win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE)
+        style |= win32con.WS_EX_LAYERED
+        win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE,style)
+        transparent_color = win32api.RGB(0,0,0)
+        hdc = win32gui.GetDC(hwnd)
+        win32gui.SetBkColor(hdc, transparent_color)
+        win32gui.ReleaseDC(hwnd, hdc)
+
+
+        
+
+    # to bring back close animation
+    @Slot(QObject)
+    def aboutToClose(self, window):
+        self.window = window
+        hwnd = int(self.window.winId())
+        style = win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE)
+        style &= ~win32con.WS_EX_LAYERED
+        win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE,style)
+        self.window.close()
+
 
 if __name__ == "__main__":
     import sys
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon("cache/aoh_icon.ico"))
-    bridge = Bridge()
-    playButton = PlayButtonTextBridge()
     engine = QQmlApplicationEngine()
+    bridge = Bridge()
+    toolbar_button_handler = ToolBarButtonHandler()
+    play_button_handler = PlayButtonBridge()
     console_model = ConsoleModel()
+    username_handler = UsernameInputHandler()
     engine.rootContext().setContextProperty("bridge", bridge)
-    engine.rootContext().setContextProperty("playButton", playButton)
+    engine.rootContext().setContextProperty("toolbarButtonHandler", toolbar_button_handler)
+    engine.rootContext().setContextProperty("playButton", play_button_handler)
+    engine.rootContext().setContextProperty("username", username_handler)
     engine.rootContext().setContextProperty("consoleModel", console_model)
     engine.load(QUrl("qml/app.qml"))
     if not engine.rootObjects(): sys.exit(-1)
