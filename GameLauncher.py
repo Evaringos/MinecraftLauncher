@@ -43,11 +43,11 @@ def check_game_installed():
     if os.path.exists(version_folder):
         is_game_installed = True
         # Проверяем, установлена ли версия Forge
-        # versions = minecraft_launcher_lib.utils.get_installed_versions(minecraft_path)
-        # for version in versions:
-            # if version["id"].startswith(base_version + "-forge"):
-                # forge_version_name = version["id"]
-                # break
+        versions = minecraft_launcher_lib.utils.get_installed_versions(minecraft_path)
+        for version in versions:
+            if version["id"].startswith(base_version + "-forge"):
+                forge_version_name = version["id"]
+                break
         signals.play_button_state_changed.emit(True)
         signals.play_button_text_changed.emit("Play")
     else: signals.play_button_text_changed.emit("Install game")

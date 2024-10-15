@@ -36,6 +36,9 @@ QtObject { // blue theme
     property int menuArrowSize: Theme.buttonIconSize / 2
     property int menuWidth: 100
 
+    property color dialogBorderColor: accentColBright
+    property color dialogDarkness: "#40000000"
+
     function toggleTheme() {
         themeName = themeName === "light" ? "dark" : "light"
     }

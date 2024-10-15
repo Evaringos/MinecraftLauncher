@@ -73,11 +73,9 @@ Rectangle {
             topRightRadius : borderradius
             color: Theme.toolbarBackground
         }
-        // Rectangle { // line under toolbar
-        //     width: root.width
-        //     height: Theme.borderWidth
-        //     color: Theme.borderColor
-        // }
+
+
+
 }
 
     MultiEffect {
@@ -103,7 +101,6 @@ Rectangle {
     }
 
 
-
     Rectangle {
         // Рамка вокруг окна
         id: frame_border
@@ -120,6 +117,9 @@ Rectangle {
 
 
     AoHContent { id: aohContent }
+
+    AoHDialog { id: accountDialog }
+
 
 }
 

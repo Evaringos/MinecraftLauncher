@@ -93,6 +93,7 @@ ColumnLayout {
             width: 40 // 215
             bgOpacity: 0.5
             iconSource: "../cache/icons/account.svg"
+            onClicked: accountDialog.appear()
             // title: qsTr("Account")
         }
     }
@@ -112,4 +113,5 @@ ColumnLayout {
         onClicked: playButton.play_pressed()
         Layout.bottomMargin: 30
     }
+
 }

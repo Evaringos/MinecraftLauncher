@@ -130,7 +130,7 @@ Menu {
 
     background: Rectangle {
         id: menubgrect
-        // implicitWidth: 120
+        implicitWidth: Theme.menuWidth
         implicitHeight: 20
         color: Theme.accentCol
         border.color: Theme.accentColBright
