@@ -4,6 +4,9 @@
 
 This project is dedicated to creating a Minecraft launcher based on Python. Our team consists of three independent developers who are creating their own modifications and Minecraft launcher. This is a FREE open-source project. Our main goal is to improve the gameplay of vanilla Minecraft! As junior level developers, we will be glad to receive any of your comments and advice.
 
+## Download launcher
+[Click here to download](https://github.com/Evaringos/MinecraftLauncher/releases)
+
 ## Features
 
 - Minimalistic design
